@@ -69,3 +69,19 @@
   numpages = {0},
 }
 
+
+@article{Huse1986,
+  author = {Huse, David A.},
+  title = {Corrections to late-stage behavior in spinodal decomposition: Lifshitz-Slyozov scaling and Monte Carlo simulations},
+  publisher = {American Physical Society},
+  journal = {Phys. Rev. B},
+  month = {Dec},
+  year = {1986},
+  doi = {10.1103/PhysRevB.34.7845},
+  volume = {34},
+  issue = {11},
+  pages = {7845--7850},
+  numpages = {0},
+}
+
+
