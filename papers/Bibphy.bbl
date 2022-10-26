@@ -56,3 +56,16 @@
   numpages = {0},
 }
 
+@article{Clewett2012,
+  author = {Clewett, J. et al.},
+  title = {Emergent Surface Tension in Vibrated, Noncohesive Granular Media},
+  publisher = {American Physical Society},
+  journal = {Phys. Rev. Lett.},
+  month = {Nov},
+  year = {2012},
+  doi = {10.1103/PhysRevLett.109.228002},
+  volume = {109},
+  issue = {22},
+  numpages = {0},
+}
+
