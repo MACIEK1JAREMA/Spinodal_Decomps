@@ -1,0 +1,45 @@
+\documentclass{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{bm}
+\usepackage[margin=1in]{geometry}
+\newcommand{\uvecr}{{\bm{\hat{\textnormal{\bfseries r}}}}}
+\DeclareRobustCommand{\uvec}[1]{{%
+		\ifcat\relax\noexpand#1%
+		% it should be a Greek letter
+		\bm{\hat{#1}}%
+		\else
+		\ifcsname uvec#1\endcsname
+		\csname uvec#1\endcsname
+		\else
+		\bm{\hat{\mathbf{#1}}}%
+		\fi
+		\fi
+}}
+\begin{document}
+
+\textbf{Name:} Joe
+
+\textbf{Date:} 26/10/22
+
+\bigskip
+
+We need to calculate the structure factor of the system. This can calculated by finding the Fourier Transform of the order parameter $\phi$ and then finding $\langle \phi(\boldsymbol{k})\phi(\boldsymbol{-k})\rangle$, or $\langle \phi(\boldsymbol{k})\phi(\boldsymbol{k}+\boldsymbol{k_{0}})\rangle$ for some Fourier space element $k_{0}$ (basically the Fourier analogue of calculating the Correlation Function $\langle\phi(\boldsymbol{x})\phi(\boldsymbol{x}+\boldsymbol{r})\rangle$, where $\boldsymbol{k_{0}}$ and $\boldsymbol{r}$ are arbitrary vectors in Fourier and real space). I'm not clear on which equation to use.
+
+\medskip
+
+Once we have the structure factor S, we can plot it against $k$ for various times $t$, and we'll find that they produce different decay curves. For larger $t$, we'll find that the decay curve is steeper. If we scale the $k$ axis by $t^{1/2}$ or $t^{-1/2}$ (I'm not sure which yet), all the curves will fall onto each other.
+
+
+
+From this, we should be able to extract the dynamic scaling exponent, which has a value of $z=2$.
+
+\medskip
+
+$\nabla\phi$ can discretised along a square grid with separation $\Delta x$ in each direction.
+
+\begin{equation}
+	\nabla \phi \approx \frac{\Delta \phi}{\Delta x^{2}} \frac{\phi_{i+1,j} + \phi{i-1,j} + \phi{i,j+1} + \phi{i,j-1}-4\phi}{\Delta x^{2}}
+\end{equation}
+
+\rule{\textwidth}{0.4pt}
+\end{document}
