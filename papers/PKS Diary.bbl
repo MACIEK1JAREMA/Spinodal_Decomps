@@ -1,0 +1,58 @@
+# Set up:
+# Keep it in order of Author, title, publication, journal, month, year, doi, and then rest.
+# do not inlcude too many author names, just state - & others - after max of 5
+# do not inlucde keywords, licences, abstracts etc.
+# keep labels as SurnameYear, unless repeat then order by moth with a,b,c etc.
+
+
+@article{Bray1994,
+  author = {A.J. Bray},
+	title = {Theory of phase-ordering kinetics},
+	journal = {Advances in Physics},
+  publisher = {Informa {UK} Limited},
+	doi = {10.1080/00018739400101505},
+  month = {jun},
+	year = 1994,
+	volume = {43},
+	number = {3},
+	pages = {357--459},
+}
+
+@InProceedings{Amar1990,
+  author={Amar, J. G.},
+  title={Monte Carlo Studies of Spinodal Decomposition in the 2d Kinetic Ising Model},
+  booktitle={Computer Simulation Studies in Condensed Matter Physics II},
+  publisher={Springer Berlin Heidelberg},
+  year={1990},
+  pages={173--178},
+  isbn={978-3-642-75234-6}
+}
+
+
+@article{Fratzl 1994,
+  author = {P. Fratzl and O. Penrose},
+  title = {Kinetics of spinodal decomposition in the Ising model with vacancy diffusion},
+  publisher = {American Institute of Physics},
+  journal = {Physical Review B: Condensed Matter},
+  year = {1994},
+  doi = {10.1103/PhysRevB.50.3477},
+  volume = {50},
+  pages = {3477--3480},
+  issn = {0163-1829},
+  number = {5},
+}
+
+@article{Nightingale1996,
+  author = {Nightingale, M. P. and Bl\"ote, H. W. J.},
+  title = {Dynamic Exponent of the Two-Dimensional Ising Model and Monte Carlo Computation of the Subdominant Eigenvalue of the Stochastic Matrix},
+  publisher = {American Physical Society},
+  journal = {Phys. Rev. Lett.},
+  month = {Jun},
+  year = {1996},
+  doi = {10.1103/PhysRevLett.76.4548},
+  volume = {76},
+  issue = {24},
+  pages = {4548--4551},
+  numpages = {0},
+}
+
