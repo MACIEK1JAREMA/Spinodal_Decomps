@@ -29,7 +29,7 @@ def field_function(lattice, t, N, delta_x):
 if __name__ == "__main__":
     # Creating a lattice with a default spacing of 1 (distance between
     # neighbouring lattice points) with side length grid_size
-    grid_size = 3
+    grid_size = 5
     grid_spacing = 1
     grid = np.zeros((grid_size,grid_size))
     
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     phi = np.zeros(num_time_steps, dtype=object)
     for i in range(len(phi)):
         phi[i] = np.reshape(sol[i], (grid_size, grid_size))
-    
+        
     # Grabbing the centre value for plotting. Can't figure out how to vectorise
     centre_phi = np.zeros(num_time_steps)
     for i, grid in enumerate(phi):
@@ -62,6 +62,20 @@ if __name__ == "__main__":
     ax_centre.set_xlabel("Time $t$", fontsize=16)
     ax_centre.set_ylabel("$\phi_{1,1}(t)$", fontsize=16)
     
+    # Displays an image which shows how the system is behaving at a given timestep
+    fig = plt.figure()
+    ax = fig.gca()
+    img = ax.imshow(phi[500], cmap="Greys")
+    ax.set_aspect("equal")
+    
+    cax = fig.add_axes([0.2, 0.1, 0.8, 0.8])
+    cax.get_xaxis().set_visible(False)
+    cax.get_yaxis().set_visible(False)
+    cax.patch.set_alpha(0)
+    cax.set_frame_on(False)
+    fig.colorbar(img, orientation='vertical')
+    plt.show()
+    
     '''
     #### Remarks #### 
     1) Maybe perform the maths with a row vector instead of a grid? This would
@@ -70,8 +84,24 @@ if __name__ == "__main__":
     
     2) Given the fact we have the grid form of phi, we can create an animation
     from this and t_array, but I'm not sure how to do that yet
+        2.5) imshow seems to do a great job of visalising the lattice, so we could 
+        use it to create an animation
     '''
     
-    
+#%%
+# Animation
+import matplotlib.animation as animation
+
+if __name__ == "__main__":
+    fig_ani = plt.figure()
+    ax_ani = fig_ani.gca()
+    ims = []
+    for i in range(num_time_steps):
+        im = ax.imshow(phi[i])
+        if i == 0:
+            ax_ani.imshow(phi[0])
+        ims.append([im])
+        
+    ani = animation.ArtistAnimation(fig_ani, ims, interval=50, blit=True, repeat_delay=1000)
 
 
