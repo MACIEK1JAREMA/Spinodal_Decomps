@@ -53,12 +53,14 @@ if __name__ == "__main__":
     # Grabbing the centre value for plotting. Can't figure out how to vectorise
     centre_phi = np.zeros(num_time_steps)
     for i, grid in enumerate(phi):
-        centre_grid[i] = grid[1,1]
+        centre_phi[i] = grid[1,1]
         
-
-    fig_centre = plt.figure(figsize=(8,8))
+    # Plotting centre value of phi
+    fig_centre = plt.figure(figsize=(8,6))
     ax_centre = fig_centre.gca()
-    # ax_centre.plot(t_array, phi)
+    ax_centre.plot(t_array, centre_phi)
+    ax_centre.set_xlabel("Time $t$", fontsize=16)
+    ax_centre.set_ylabel("$\phi_{1,1}(t)$", fontsize=16)
     
     '''
     #### Remarks #### 
