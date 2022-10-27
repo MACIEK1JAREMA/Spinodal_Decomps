@@ -21,14 +21,29 @@ np.roll(matrix, -N)
 
 # NxN lattice
 N = 3
-M = np.zeros((N,N))
+A = np.zeros((N,N))
 
 # Set up each row to have a value equal to 1+row index
 for i in range(3):
-    M[i,:] = i+1
+    A[i,:] = i+1
     
 # Move each row down by 1
-X = np.roll(M, N)
+B = np.roll(A, N)
 
-print(M)
+print(A)
+print(B)
+
+#%%
+# We can also move columns, but now we have to set a=1 and the axis=1.
+
+N = 3
+X = np.zeros((N,N))
+
+for i in range(3):
+   X[:,i] = i+1
+   
+Y = np.roll(X, 1, axis=1)
+
 print(X)
+print(Y)
+    
