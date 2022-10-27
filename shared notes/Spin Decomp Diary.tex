@@ -114,4 +114,14 @@ Since $\phi$ decays exponentially here, we could use some \texttt{SciPy} curve f
 
 We'll need to animate this to make what's happening a lot clearer. This graph works great for a single lattice site, but it's not any good for the whole lattice. I remember Moriarty had some things written on animations.
 
+\medskip
+
+This little bit is a little while (~2 hours) after the previous section of this diary entry. I've pulled together a rudimentary animation, although I suspect that the calculations are wrong. Figure \ref{phi after 1 second} shows the lattice after 1 second (after the system has evolved in time). The lattice sites around the centre, which is initialised to have value 1, do not evenly "grow" in value.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.8\textwidth]{first_evolution.png}
+	\caption{\label{first phi plot}Plotting $\phi_{1,1}$, which was initialised to have the value $\phi=1$, against time $t$. It displays exponential decay behaviour, which is what we expect.}
+\end{figure}
+
 \end{document}
