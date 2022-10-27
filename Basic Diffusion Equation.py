@@ -45,14 +45,20 @@ if __name__ == "__main__":
     sol = odeint(field_function, initial_conditions, t_array, args=(grid_size, grid_spacing))
     
     # Each row needs to be reshaped back into a 3x3 grid for every time step
+    # Needs to be made more efficient if possible
     phi = np.zeros(num_time_steps, dtype=object)
     for i in range(len(phi)):
         phi[i] = np.reshape(sol[i], (grid_size, grid_size))
+    
+    # Grabbing the centre value for plotting. Can't figure out how to vectorise
+    centre_phi = np.zeros(num_time_steps)
+    for i, grid in enumerate(phi):
+        centre_grid[i] = grid[1,1]
         
-    centre_phi = 
+
     fig_centre = plt.figure(figsize=(8,8))
     ax_centre = fig_centre.gca()
-    ax_centre.plot(t_array, phi)
+    # ax_centre.plot(t_array, phi)
     
     '''
     #### Remarks #### 
@@ -60,7 +66,8 @@ if __name__ == "__main__":
     vectorise the operations more efficiently by skipping out on the lattice
     reshaping steps in field_function
     
-    2) Given the 
+    2) Given the fact we have the grid form of phi, we can create an animation
+    from this and t_array, but I'm not sure how to do that yet
     '''
     
     
