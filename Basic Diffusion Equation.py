@@ -29,7 +29,7 @@ def field_function(lattice, t, N, delta_x):
 if __name__ == "__main__":
     # Creating a lattice with a default spacing of 1 (distance between
     # neighbouring lattice points) with side length grid_size
-    grid_size = 5
+    grid_size = 3
     grid_spacing = 1
     grid = np.zeros((grid_size,grid_size))
     
@@ -93,15 +93,34 @@ if __name__ == "__main__":
 import matplotlib.animation as animation
 
 if __name__ == "__main__":
-    fig_ani = plt.figure()
-    ax_ani = fig_ani.gca()
+    '''
+    Code for animation retrieved and adjusted from:
+        https://matplotlib.org/stable/gallery/animation/dynamic_image.html
+    '''
+    
+    fig_ani, ax_ani = plt.subplots()
+    
+    def f(x, y):
+        return np.sin(x) + np.cos(y)
+
+    x = np.linspace(0, 2 * np.pi, 120)
+    y = np.linspace(0, 2 * np.pi, 100).reshape(-1, 1)
+    
+    # ims is a list of lists, each row is a list of artists to draw in the
+    # current frame; here we are just animating one artist, the image, in
+    # each frame
     ims = []
-    for i in range(num_time_steps):
-        im = ax.imshow(phi[i])
+    for i in range(500):
+        val = phi[i]
+        x += np.pi / 15.
+        y += np.pi / 20.
+        im = ax_ani.imshow(val, cmap="Greys", animated=True)
         if i == 0:
-            ax_ani.imshow(phi[0])
+            print(np.shape(val))
+            ax_ani.imshow(val, cmap="Greys")  # show an initial one first
         ims.append([im])
-        
-    ani = animation.ArtistAnimation(fig_ani, ims, interval=50, blit=True, repeat_delay=1000)
+    
+    ani = animation.ArtistAnimation(fig_ani, ims, interval=5, blit=True,
+                                    repeat_delay=1000)
 
 
