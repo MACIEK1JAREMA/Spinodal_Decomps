@@ -102,7 +102,7 @@ After \texttt{odeint} has given us the solution, we can retrieve the lattice by 
 
 Then, again using for loops because vectorising things is difficult, we can retrieve $\phi$ for a given lattice site for every point in time. This gives the plot in figure \ref{first phi plot}.
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.8\textwidth]{phi_plot.png}
 	\caption{\label{first phi plot}Plotting $\phi_{1,1}$, which was initialised to have the value $\phi=1$, against time $t$. It displays exponential decay behaviour, which is what we expect.}
@@ -118,10 +118,16 @@ We'll need to animate this to make what's happening a lot clearer. This graph wo
 
 This little bit is a little while (~2 hours) after the previous section of this diary entry. I've pulled together a rudimentary animation, although I suspect that the calculations are wrong. Figure \ref{phi after 1 second} shows the lattice after 1 second (after the system has evolved in time). The lattice sites around the centre, which is initialised to have value 1, do not evenly "grow" in value.
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\textwidth]{first_evolution.png}
-	\caption{\label{first phi plot}Plotting $\phi_{1,1}$, which was initialised to have the value $\phi=1$, against time $t$. It displays exponential decay behaviour, which is what we expect.}
+	\includegraphics[width=0.8\textwidth]{rudimentary_animation_frame.png}
+	\caption{\label{phi after 1 second}After 1 second of time, this is the state of the system. We should expect an even diffusion of the order parameter, but it's asymmetric. The calculations are probably wrong.}
 \end{figure}
+
+Also, we're supposed to be using dimensionless variables in computing differential equations, but we can't make $t$ dimensionless because we don't have any variables with which to make $t$ dimensionless? Like $\tilde{t}=\omega t$ for a harmonic oscillator would provide dimensionless $t$, but we can't do that here.
+
+\rule{\textwidth}{0.4pt}
+
+
 
 \end{document}

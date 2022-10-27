@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7140 64-bit) (preloaded format=pdflatex 2019.9.25)  27 OCT 2022 15:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7140 64-bit) (preloaded format=pdflatex 2019.9.25)  27 OCT 2022 17:02
 entering extended mode
 **"./Spin Decomp Diary.tex"
 ("Spin Decomp Diary.tex"
@@ -310,36 +310,55 @@ File: phi_plot.png Graphic file (type png)
 <use phi_plot.png>
 Package pdftex.def Info: phi_plot.png  used on input line 107.
 (pdftex.def)             Requested size: 375.80544pt x 281.84966pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
 [1
 
-{C:/Users/joepw/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] [2 <./phi_p
-lot.png>] ("Spin Decomp Diary.aux") ) 
+{C:/Users/joepw/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
+<rudimentary_animation_frame.png, id=19, 462.528pt x 346.896pt>
+File: rudimentary_animation_frame.png Graphic file (type png)
+<use rudimentary_animation_frame.png>
+Package pdftex.def Info: rudimentary_animation_frame.png  used on input line 12
+3.
+(pdftex.def)             Requested size: 375.80544pt x 281.86818pt.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Overfull \hbox (15.0pt too wide) in paragraph at lines 129--130
+[][] 
+ []
+
+[2 <./phi_plot.png>] [3 <./rudimentary_animation_frame.png>]
+("Spin Decomp Diary.aux") ) 
 Here is how much of TeX's memory you used:
- 2956 strings out of 492895
- 41250 string characters out of 3123735
- 117612 words of memory out of 3000000
- 6826 multiletter control sequences out of 15000+200000
+ 2962 strings out of 492895
+ 41444 string characters out of 3123735
+ 117620 words of memory out of 3000000
+ 6831 multiletter control sequences out of 15000+200000
  8264 words of font info for 32 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,7n,32p,718b,223s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/Users/joepw/AppData/Local/Programs/MiK
-TeX 2.9/fonts/type1/public/amsfonts/cm/cmbsy10.pfb><C:/Users/joepw/AppData/Loca
-l/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/joepw
-/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx7.pfb><C:
-/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/c
-mex10.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/
-amsfonts/cm/cmmi10.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/
-type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTe
-X 2.9/fonts/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/joepw/AppData/Local/
-Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/joepw/Ap
-pData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Use
-rs/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy1
-0.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsf
-onts/cm/cmsy7.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
-/public/amsfonts/cm/cmtt10.pfb>
-Output written on "Spin Decomp Diary.pdf" (2 pages, 144773 bytes).
+ 41i,7n,32p,718b,221s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fo
+nts/type1/public/amsfonts/cm/cmbsy10.pfb><C:/Users/joepw/AppData/Local/Programs
+/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/joepw/AppData/L
+ocal/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx7.pfb><C:/Users/joe
+pw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb>
+<C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/c
+m/cmmi10.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/publ
+ic/amsfonts/cm/cmmi7.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/font
+s/type1/public/amsfonts/cm/cmmib10.pfb><C:/Users/joepw/AppData/Local/Programs/M
+iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/joepw/AppData/Loca
+l/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/joepw/A
+ppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/
+Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cm
+sy7.pfb><C:/Users/joepw/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/am
+sfonts/cm/cmtt10.pfb>
+Output written on "Spin Decomp Diary.pdf" (3 pages, 159786 bytes).
 PDF statistics:
- 60 PDF objects out of 1000 (max. 8388607)
+ 65 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
