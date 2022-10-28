@@ -19,7 +19,7 @@ def field_function(lattice, t, N, delta_x):
     phi_right = np.roll(lattice, 1, axis=1)
     phi_left = np.roll(lattice, -1, axis=1)
     phi_above = np.roll(lattice, N)
-    phi_below = np.roll(lattice, N)
+    phi_below = np.roll(lattice, -N)
     
     phi_dot = (phi_right + phi_left + phi_above + phi_below - 4*lattice)/delta_x**2
     
@@ -29,17 +29,21 @@ def field_function(lattice, t, N, delta_x):
 if __name__ == "__main__":
     # Creating a lattice with a default spacing of 1 (distance between
     # neighbouring lattice points) with side length grid_size
-    grid_size = 3
+    grid_size = 5
     grid_spacing = 1
     grid = np.zeros((grid_size,grid_size))
     
     # Setting up the initial conditions
-    grid[1,1] = 1
+    # grid[1,1] = 1
+    grid = np.random.rand(grid_size, grid_size)
+    
     initial_conditions = np.reshape(grid, np.size(grid))
+    
     
     # Establishing time array to run simulation over
     num_time_steps = 1024
-    t_array = np.linspace(0, 1, num_time_steps)
+    tmax = 5
+    t_array = np.linspace(0, tmax, num_time_steps)
     
     # Using odeint to get solution
     sol = odeint(field_function, initial_conditions, t_array, args=(grid_size, grid_spacing))
@@ -65,7 +69,7 @@ if __name__ == "__main__":
     # Displays an image which shows how the system is behaving at a given timestep
     fig = plt.figure()
     ax = fig.gca()
-    img = ax.imshow(phi[500], cmap="Greys")
+    img = ax.imshow(phi[-1], cmap="Greys", vmin=0, vmax=1)
     ax.set_aspect("equal")
     
     cax = fig.add_axes([0.2, 0.1, 0.8, 0.8])
@@ -86,6 +90,8 @@ if __name__ == "__main__":
     from this and t_array, but I'm not sure how to do that yet
         2.5) imshow seems to do a great job of visalising the lattice, so we could 
         use it to create an animation
+    
+    3) How can we model quenching from T > T_c to T = 0?
     '''
     
 #%%
@@ -100,27 +106,20 @@ if __name__ == "__main__":
     
     fig_ani, ax_ani = plt.subplots()
     
-    def f(x, y):
-        return np.sin(x) + np.cos(y)
-
-    x = np.linspace(0, 2 * np.pi, 120)
-    y = np.linspace(0, 2 * np.pi, 100).reshape(-1, 1)
-    
     # ims is a list of lists, each row is a list of artists to draw in the
     # current frame; here we are just animating one artist, the image, in
     # each frame
     ims = []
-    for i in range(500):
-        val = phi[i]
-        x += np.pi / 15.
-        y += np.pi / 20.
-        im = ax_ani.imshow(val, cmap="Greys", animated=True)
+    for i in range(num_time_steps):
+        im = ax_ani.imshow(phi[i], cmap="Greys", vmin=0, vmax=1, animated=True)
         if i == 0:
-            print(np.shape(val))
-            ax_ani.imshow(val, cmap="Greys")  # show an initial one first
+            ax_ani.imshow(phi[i], cmap="Greys")  # show an initial one first
         ims.append([im])
     
     ani = animation.ArtistAnimation(fig_ani, ims, interval=5, blit=True,
-                                    repeat_delay=1000)
-
+                                    repeat_delay=10)
+    
+    # file_name = str(grid_size)+"_grid_diffusion.mp4"
+    # writer = animation.PillowWriter(fps=15)
+    # ani.save("movie.gif", writer=writer)
 
