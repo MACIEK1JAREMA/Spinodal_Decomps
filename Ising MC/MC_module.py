@@ -72,6 +72,56 @@ def MC(N, J, T, t0, tm, nth=1):
     return configs
 
 
+def annulus_avg(ft, N, dk):
+    """
+    Finds average of 
+    """
+    
+    kvals = np.arange(0, N, dk)
+    average = np.zeros(len(kvals))
+    
+    for j, k in enumerate(kvals):
+    
+        # prepare axes
+        N_half = int(N/2)
+        axes = np.arange(-N_half, N_half, 1)
+        kx, ky = np.meshgrid(axes, axes)
+        
+        # get square radius
+        dist_sq = kx**2 + ky**2
+        
+        # Get all values in [k, k+dk]    
+        indices = np.argwhere((dist_sq >= k**2) & (dist_sq < (k+dk)**2))
+        rows = indices[:,0]
+        columns = indices[:,1]
+        
+        # find average of all of those
+        average[j] = np.mean(abs(ft[rows, columns]))
+    
+    return average, kvals
+
+
+def Sk_MCrun(N, J, T, dk, t0, tm, nth):
+    """
+    """
+    
+    configs = MC(N, J, T, t0, tm, nth=nth)
+    
+    # Calculating structure factor for various time steps
+    k_num = len(np.arange(0, N, dk))
+    average = np.zeros((k_num, len(configs[0, 0, :])))
+    for i in range(len(configs[0, 0, :])):
+        # Lattice spins FT
+        ft = np.fft.ifftshift(configs[:, :, i])
+        ft = np.fft.fft2(ft)
+        ft = np.fft.fftshift(ft)
+        
+        # Finding average for k over multiple radii
+        av, _ = annulus_avg(ft, N, dk)
+        average[:, i] = av
+    
+    return average
+
 # %%
 
 if __name__ == "__main__":
