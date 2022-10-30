@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from continuum_solvers import solver
 
-def annulus_average(ft, N, r1, dr):
+def annulus_average(ft, N, k1, dk):
     half_grid_size = int(N/2)
     grid_range = np.arange(-half_grid_size, half_grid_size, 1)
     kx, ky = np.meshgrid(grid_range, grid_range)
@@ -11,9 +11,9 @@ def annulus_average(ft, N, r1, dr):
     sum_of_squares = kx**2 + ky**2
     
     # Grabbing all Fourier transform values between two radii
-    r2 = r1 + dr
+    k2 = k1 + dk
     
-    indices = np.argwhere((sum_of_squares >= r1**2) & (sum_of_squares < r2**2))
+    indices = np.argwhere((sum_of_squares >= k1**2) & (sum_of_squares < k2**2))
     rows = indices[:,0]
     columns = indices[:,1]
     
@@ -27,28 +27,42 @@ if __name__ == "__main__":
     grid = np.random.rand(grid_size,grid_size)*2 - 1
     
     # Time array
-    tmax = 1
+    tmax = 50
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
     # Evolves the lattice over time. "driving" adds the driving term if True
     phi = solver(grid, t_array, grid_size, grid_spacing, driving=True)
-    end_state = phi[-1]
     
-    # Fourier transform of the lattice. No shift to centralise peak
-    ft = np.fft.ifftshift(end_state)
-    ft = np.fft.fft2(ft)
-    ft = np.fft.fftshift(ft)
+    # Calculating and plotting structure factor for various time steps
+    fig_sf = plt.figure(figsize=(8,6))
+    ax_sf = fig_sf.gca()
+    ax_sf.set_xlabel("$k$", fontsize=16)
+    ax_sf.set_ylabel("SF($k$)", fontsize=16)
+    ax_sf.set_title("Structure Factor", fontsize=18)
     
-    # Finding average for k over multiple radii
-
-    dr = 1
-    kvals = np.arange(0, grid_size, dr)
-    average = np.zeros(len(kvals))
-    for i, k in enumerate(kvals):
-        average[i] = annulus_average(ft, grid_size, k, dr)
+    for index in np.linspace(0, num_time_steps-1, 4):
+        index = int(index)
+        state = phi[index]
         
-    # Selecting a state to look at and displaying ite
+        # Fourier transform of the lattice
+        ft = np.fft.ifftshift(state)
+        ft = np.fft.fft2(ft)
+        ft = np.fft.fftshift(ft)
+        
+        # Finding average for k over multiple radii
+        dk = 1
+        kvals = np.arange(0, grid_size, dk)
+        average = np.zeros(len(kvals))
+        for i, k in enumerate(kvals):
+            average[i] = annulus_average(ft, grid_size, k, dk)
+                 
+        time = str(np.round(t_array[index],3))
+        ax_sf.plot(kvals, average, label="$t$="+time)
+    ax_sf.legend(fontsize=12)
+        
+    # Displaying the end state
+    end_state = phi[-1]
     fig_phi = plt.figure(figsize=(8,6))
     ax_phi = fig_phi.gca()
     ax_phi.set_title("Landau-Ginzburg Equation Evolution\nN="+str(grid_size)+", $t$="+\
@@ -76,12 +90,13 @@ if __name__ == "__main__":
     cax.set_frame_on(False)
     fig_ft.colorbar(img_ft, orientation='vertical')
     
-    # Plotting structure factor as function of k for one state
-    fig_sf = plt.figure(figsize=(8,6))
-    ax_sf = fig_sf.gca()
-    ax_sf.set_xlabel("$k$", fontsize=16)
-    ax_sf.set_ylabel("SF($k$)", fontsize=16)
-    ax_sf.plot(kvals, average)
+    '''
+    Remarks:
+        1) We could do a fun animation of evolving the state in time and
+          plotting the structure factor curve at the same time on another plot.
+          Just need to do all the calculations and then make the animation after
+    '''
+    
 #%%
 
 if __name__ == "__main__":
