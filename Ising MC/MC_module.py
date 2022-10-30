@@ -12,8 +12,8 @@ def MC(N, J, T, t0, tm, nth=1):
     Params:
       ---------------------------
      -- N - int64 - size of lattice side
-     -- J - int64 - sisotropic coupling constant
-     -- T - int64 - temperature, remembering that Tc = 2.2692*J
+     -- J - float64 - sisotropic coupling constant
+     -- T - float64 - temperature, remembering that Tc = 2.2692*J
      -- t0 - int64 - MCS to start saving from to exclude init conditions
      -- tm - int64 - max MCS
      -- nth - int64 - optional - every nth MCS to save
