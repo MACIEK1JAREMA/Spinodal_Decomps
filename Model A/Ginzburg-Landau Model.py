@@ -41,26 +41,44 @@ if __name__ == "__main__":
     ax_sf.set_ylabel("SF($k$)", fontsize=16)
     ax_sf.set_title("Structure Factor", fontsize=18)
     
-    for index in np.linspace(0, num_time_steps-1, 4):
-        index = int(index)
-        state = phi[index]
+    # num_curves = 20
+    # time_interval = int(np.round(num_time_steps/num_curves, 0))
+    # state_interval = int(np.round(len(phi)/num_curves, 0))
+    '''Can't quite work out how to do an integer number of curves, so picking 16'''
+    time_interval, state_interval = 64, 64
+    sf_times = t_array[::time_interval]
+    sf_states = phi[::state_interval]
+    dk = 1
+    kvals = np.arange(0, grid_size, dk)
+    sf = np.zeros(len(sf_times), dtype=object)
+    
+    for i, time_and_state in enumerate(zip(sf_times, sf_states)):
+        time = time_and_state[0]
+        state = time_and_state[1]
         
         # Fourier transform of the lattice
         ft = np.fft.ifftshift(state)
         ft = np.fft.fft2(ft)
         ft = np.fft.fftshift(ft)
         
+        # Set up structure factor array
+        sf[i] = np.zeros(len(ft))
+        
         # Finding average for k over multiple radii
-        dk = 1
-        kvals = np.arange(0, grid_size, dk)
-        average = np.zeros(len(kvals))
-        for i, k in enumerate(kvals):
-            average[i] = annulus_average(ft, grid_size, k, dk)
-                 
-        time = str(np.round(t_array[index],3))
-        ax_sf.plot(kvals, average, label="$t$="+time)
+        for j, k in enumerate(kvals):
+            sf[i][j] = annulus_average(ft, grid_size, k, dk)
+    
+    # Plotting structure factor for each time step
+    for structure_factor, time in zip(sf[1:], sf_times):
+        ax_sf.plot(kvals, structure_factor/sf[0], label="$t$="+str(np.round(time,1)))
     ax_sf.legend(fontsize=12)
         
+    '''
+    TO-DO
+    Need to make this average over a bunch of states now, either wrap the
+    above in a for loop or define it as a function
+    '''
+    
     # Displaying the end state
     end_state = phi[-1]
     fig_phi = plt.figure(figsize=(8,6))
