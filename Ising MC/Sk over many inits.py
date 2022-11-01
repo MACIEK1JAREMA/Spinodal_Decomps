@@ -46,7 +46,7 @@ avgSk_norm = np.nan_to_num(avgSk_norm, 0)
 #axSn = figSn.gca()
 #axSn.tick_params(labelsize=22)
 #axSn.set_xlabel(r"$k$", fontsize=22)
-#axSn.set_ylabel(r"SF($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
+#axSn.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
 #
 #for i in range(1, len(avgSk_norm[0, :])):
 #    time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -83,3 +83,21 @@ print(f'with R-value of {np.round(rval1, 4)}')
 print('\n')
 ax.plot(t_vals, np.exp(c1)*t_vals**m1, '-.b', label=f'fit at gradient={np.round(m1, 4)}')
 
+# plot S(k) with circularly averaged k and averaged over initial conditions
+# rescaled for proposed universal scaling relation
+
+figUni = plt.figure(figsize=(10, 7))
+axUni = figUni.gca()
+axUni.tick_params(labelsize=22)
+axUni.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
+axUni.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
+
+t_vals = np.append(np.array([0]), t_vals)
+
+for i in range(0, len(avgSk_norm[0, :])):
+    if i == 0:
+        time = "0 MCS"
+    else:
+        time = str(int(nth*(i-1) + t0)) + " MCS"
+        
+    axUni.plot(kvals*t_vals[i]**m1, avgSk_norm[:, i]/t_vals[i]**(-2*m1), label=r"$t=$"+time)

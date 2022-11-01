@@ -74,7 +74,7 @@ figS = plt.figure(figsize=(8,6))
 axS = figS.gca()
 axS.tick_params(labelsize=22)
 axS.set_xlabel(r"$k$", fontsize=22)
-axS.set_ylabel(r"SF($k$)", fontsize=22)
+axS.set_ylabel(r"S($k$)", fontsize=22)
 
 
 # Same but normalise it to S(k, 0)
@@ -82,7 +82,7 @@ figSn = plt.figure(figsize=(8,6))
 axSn = figSn.gca()
 axSn.tick_params(labelsize=22)
 axSn.set_xlabel(r"$k$", fontsize=22)
-axSn.set_ylabel(r"SF($k$)$/$S($k$)$|_{t_{0}}$", fontsize=22)
+axSn.set_ylabel(r"S($k$)$/$S($k$)$|_{t_{0}}$", fontsize=22)
 
 
 for i in range(len(configs[0, 0, :])):
