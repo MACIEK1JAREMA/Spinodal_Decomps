@@ -306,6 +306,7 @@ def Sk_MCrun_ani(N, Jx, Jy, T, dk, t0, tm, nth):
     
     # Calculating structure factor for various time steps
     k_num = len(np.arange(0, N, dk))
+    kmax = np.zeros((len(configs[0, 0, :])))
     average = np.zeros((k_num, len(configs[0, 0, :])))
     for i in range(len(configs[0, 0, :])):
         # Lattice spins FT
@@ -314,8 +315,12 @@ def Sk_MCrun_ani(N, Jx, Jy, T, dk, t0, tm, nth):
         ft = np.fft.fftshift(ft)
         
         # Finding average for k over multiple radii
-        av, kvals, kmax = annulus_avg(ft*np.conj(ft), N, dk)
-        average[:, i] = av
+        av, kvals, km = annulus_avg(ft*np.conj(ft), N, dk)
+        kmax[i] = km
+        
+        # add zeros to average so that it retains right shape:
+        avg = np.append(av, np.zeros(( len(average[:, 0]) - len(av) )))
+        average[:, i] = avg
     
     return average, kmax
 
@@ -328,6 +333,7 @@ def Sk_MCrun_frust(N, Jnn, Jnnn, T, dk, t0, tm, nth):
     
     # Calculating structure factor for various time steps
     k_num = len(np.arange(0, N, dk))
+    kmax = np.zeros((len(configs[0, 0, :])))
     average = np.zeros((k_num, len(configs[0, 0, :])))
     for i in range(len(configs[0, 0, :])):
         # Lattice spins FT
@@ -336,8 +342,12 @@ def Sk_MCrun_frust(N, Jnn, Jnnn, T, dk, t0, tm, nth):
         ft = np.fft.fftshift(ft)
         
         # Finding average for k over multiple radii
-        av, kvals, kmax = annulus_avg(ft*np.conj(ft), N, dk)
-        average[:, i] = av
+        av, kvals, km = annulus_avg(ft*np.conj(ft), N, dk)
+        kmax[i] = km
+        
+        # add zeros to average so that it retains right shape:
+        avg = np.append(av, np.zeros(( len(average[:, 0]) - len(av) )))
+        average[:, i] = avg
     
     return average, kmax
 

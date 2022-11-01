@@ -4,7 +4,7 @@ import numpy as np
 import MC_module as MC
 import matplotlib.pyplot as plt
 from matplotlib import ticker as mtick
-from Logradientplot import gradient
+from scipy.stats import linregress as linreg
 import timeit
 
 # %%
@@ -62,7 +62,7 @@ print('Time: ', stop - start)
 # find average k from it and get L
 k_vals = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
 k = np.sum(avgSk_norm*k_vals**2, axis=0)/np.sum(avgSk_norm*k_vals, axis=0)
-L = 2*pi/k
+L = 2*np.pi/k
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
 
@@ -76,5 +76,10 @@ ax.set_xscale('log')
 ax.tick_params(labelsize=22)
 ax.plot(t_vals, L[1:])  # omit initial condition as at t=0
 
-grad = gradient(t_vals, L[1:])
+# check the gradient of the linear ones
+m1, c1, rval1, _, std1 = linreg(np.log(t_vals), np.log(L[1:]))
+print(f'Linear variation with gradient = {np.round(m1, 4)} and error +- {np.round(std1, 4)}')
+print(f'with R-value of {np.round(rval1, 4)}')
+print('\n')
+ax.plot(t_vals, np.exp(c1)*t_vals**m1, '-.b', label=f'fit at gradient={np.round(m1, 4)}')
 
