@@ -3,179 +3,169 @@
 
 import numpy as np
 from numba import jit
-import time #import time module
-
-@jit(nopython=True)
-def MC(N, J, T, t0, tm, nth=1):
-    """
-    Function to compute Monte Carlo simulation of 2D Ising Model
-    
-    Params:
-      ---------------------------
-     -- N - int64 - size of lattice side
-     -- J - int64 - sisotropic coupling constant
-     -- T - int64 - temperature, remembering that Tc = 2.2692*J
-     -- t0 - int64 - MCS to start saving from to exclude init conditions
-     -- tm - int64 - max MCS
-     -- nth - int64 - optional - every nth MCS to save
-    
-    Returns:
-        ----------------------
-    -- configs - np.ndarray - size [N x N x ((t0-tm)/nth)] for lattice at each
-                            desired MSC. Includes intiial random set up at
-                            step 0, so array is 1 larger than expected from t0
-                            tm and nth. The lattice as is after MCS number 4
-                            is saved in column with index 4
-    """
-    
-    # generate lattice
-    lat = np.random.rand(N, N)
-    lat = np.sign(lat - 0.5)
-    
-    # number of MCS to complete:
-    num = int(np.floor((tm-t0)/nth)) + 1
-    
-    # generate random comparison numbers
-    z = np.random.rand(1, tm*N**2)  # random number for attempt of each MCS
-    
-    # set up nn index arrays:
-    inds = np.arange(0, N, 1)
-    inds_c = np.ones((N,1), dtype=np.int64)*inds
-    inds_r = inds_c.T
-    
-    nn_t = np.roll(inds_r, N)
-    nn_b = np.roll(inds_r, -N)
-    nn_r = nn_b.T
-    nn_l = nn_t.T
-    
-    # save results:
-    #configs = np.zeros((N, N, tm))
-    configs = np.zeros((N, N, num+1))
-    configs[:, :, 0] = lat
-    
-    # plot the resulting image onto that plot
-    
-    for t in range(1, tm+1):
-        for n in range(N**2):
-            # pick a random spin site:
-            i = np.random.randint(N)
-            j = np.random.randint(N)
-            # calculate energy factor:
-            dE = 2*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
-            r = np.exp(-dE/T)
-            if r > z[0, (t-t0)*n + n]:
-                lat[i, j] *= -1
-            # otherwise do nothing
-        # save configuration from this MCS:
-        if t >= t0 and (t-t0) % nth == 0:
-            configs[:, :, int(t/nth)+1] = lat
-    
-    return configs
-
-
-def annulus_avg(ft, N, dk):
-    """
-    Finds average of 
-    """
-    
-    kvals = np.arange(0, N, dk)
-    average = np.zeros(len(kvals))
-    
-    for j, k in enumerate(kvals):
-    
-        # prepare axes
-        N_half = int(N/2)
-        axes = np.arange(-N_half, N_half, 1)
-        kx, ky = np.meshgrid(axes, axes)
-        
-        # get square radius
-        dist_sq = kx**2 + ky**2
-        
-        # Get all values in [k, k+dk]    
-        indices = np.argwhere((dist_sq >= k**2) & (dist_sq < (k+dk)**2))
-        rows = indices[:,0]
-        columns = indices[:,1]
-        
-        # find average of all of those
-        average[j] = np.mean(abs(ft[rows, columns]))
-    
-    return average, kvals
-
-
-def Sk_MCrun(N, J, T, dk, t0, tm, nth):
-    """
-    """
-    
-    configs = MC(N, J, T, t0, tm, nth=nth)
-    
-    # Calculating structure factor for various time steps
-    k_num = len(np.arange(0, N, dk))
-    average = np.zeros((k_num, len(configs[0, 0, :])))
-    for i in range(len(configs[0, 0, :])):
-        # Lattice spins FT
-        ft = np.fft.ifftshift(configs[:, :, i])
-        ft = np.fft.fft2(ft)
-        ft = np.fft.fftshift(ft)
-        
-        # Finding average for k over multiple radii
-        av, _ = annulus_avg(ft, N, dk)
-        average[:, i] = av
-    
-    return average
+import matplotlib.pyplot as plt
+import MC_module as MC
+import time
 
 # %%
-N = 9#initial value for N
-Nfinal = 100
-sizearray = np.array([])
+
+
+N = 20  # initial value for N
+Nfinal = 500
+N_step = 20  # make sure all used N are even!
+
+# system parameters:
+J = 1
+Tc = 2.2692*J
+T = 0.1*Tc
+t0 = 1
+tm = 20
+nth = 2
+
+tarray = np.array([])
 Narray = np.array([])
+
 while N <= Nfinal:
-    if __name__ == "__main__":
-        st = time.time() #start time
-        import matplotlib.pyplot as plt
-        # set up lattice and variables
-        N = N  
+    st = time.time()  # start time
     
-        J = 1
-        Tc = 2.2692*J
-        T = 0.1*Tc
-        t0 = 1
-        tm = 20
-     
-        #fig = plt.figure(figsize=(10, 7))
-        #ax = fig.gca()
-        #ax.tick_params(labelsize=16)
-        #ax.set_xticks(np.arange(0, N+1, int(N/5)))
-        #ax.set_yticks(np.arange(0, N+1, int(N/5)))
+    # set up lattice and variables
+    configs = MC.MC(N, J, T, t0, tm, nth=nth)
+    et = time.time()  # end time
     
-        nth = 2
-        configs = MC(N, J, T, t0, tm, nth=nth)
+    tarray = np.append(tarray, et - st)
+    Narray = np.append(Narray, N)
     
-        """
-        Displays initial condition t=0, then when (t-t0) is a multiple of nth
-        t=1
-        t=3
-        t=5
-        """
-        et = time.time() #end time
-        elapsed_time = et - st
-        
-        sizearray = np.append(sizearray,elapsed_time)
-        Narray = np.append(Narray,N)
-        print('Execution time:', elapsed_time, 'seconds')
-        # animate it:
-        #for t in range(len(configs[0, 0, :])):
-        #    print('showing '+ str(t))
-        #    ax.imshow(configs[:, :, t], cmap='Greys', vmin=-1, vmax=1, interpolation=None)
-        #    plt.pause(0.5)
-        N = N + 2
+#    print('Execution time:', elapsed_time, 'seconds')
+    N = N + N_step
 
 #Narray[924] = 4
 #sizearray[924] =4        
 
 #Narray[916] = 4
-#sizearray[916] =4   
+#sizearray[916] =4
 
-plt.plot(Narray,sizearray)
-plt.title("How does run time scale with lattice size")
-plt.xlabel("N")
-plt.ylabel("Runtime(seconds")
+
+fig = plt.figure(figsize=(10, 7))
+ax = fig.gca()
+ax.tick_params(labelsize=22)
+ax.set_xlabel(r"$N$", fontsize=22)
+ax.set_ylabel(r"$t [s]$", fontsize=22)
+
+ax.plot(Narray**2, tarray)  # if linear then scales quadratically as might be expected
+
+# %%
+
+# now for full code to S(k)
+
+# system parameters:
+J = 1
+Tc = 2.2692*J
+T = 0.1*Tc
+dk = 1
+
+t0 = 5
+tm = 90
+nth = 15
+reps = 3
+
+# set up values to test times for, both number of repetitions and system size
+upto_power = 10
+N_vals = 2**np.arange(2, upto_power, dtype=np.int64)  # keeping to powers of 2 for FT
+
+tarray = np.zeros((upto_power-2))
+
+n = 0
+for N in N_vals:
+    
+    kvals = np.arange(0, N, dk)
+    mcss = int(np.floor((tm-t0)/nth)) + 2
+    k_num = len(np.arange(0, N, dk))
+    
+    st = time.time()  # start time
+    
+    average = np.zeros((k_num, mcss, reps))
+    for i in range(reps):
+        average[:, :, i] = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+    
+    # average over initial conditions and normalise w.r.t chosen t0
+    avgSk = np.sum(average, axis=2)/reps
+    avgSk_norm = avgSk / avgSk[:, 1][:, None]
+    
+    et = time.time()  # end time    
+    
+    tarray[n] = et - st
+    n += 1
+
+fig = plt.figure(figsize=(10, 7))
+ax = fig.gca()
+ax.tick_params(labelsize=22)
+ax.set_xlabel(r"$N$", fontsize=22)
+ax.set_ylabel(r"$t [s]$", fontsize=22)
+
+ax.plot(N_vals, tarray)
+
+
+fig1 = plt.figure(figsize=(10, 7))
+ax1 = fig1.gca()
+ax1.tick_params(labelsize=22)
+ax1.set_xlabel(r"$N^{2}$", fontsize=22)
+ax1.set_ylabel(r"$t [s]$", fontsize=22)
+
+ax1.plot(N_vals**2, tarray)
+
+# %%
+
+# and same but test reps too - 2D plot ----- NOT WORKING YET --------
+
+# system parameters:
+J = 1
+Tc = 2.2692*J
+T = 0.1*Tc
+t0 = 1
+tm = 20
+nth = 2
+
+dk = 1
+kvals = np.arange(0, N, dk)
+mcss = int(np.floor((tm-t0)/nth)) + 2
+k_num = len(np.arange(0, N, dk))
+
+# set up values to test times for, both number of repetitions and system size
+upto_power = 8
+N_vals = 2**np.arange(8, dtype=np.int32)
+
+num_reps = 10
+reps = np.arange(1, num_reps, 1, dtype=np.int32)
+
+tarray = np.zeros((upto_power, num_reps))
+
+i, j = 0, 0
+for r in reps:
+    for N in N_vals:
+        st = time.time()  # start time
+        
+        average = np.zeros((k_num, mcss, r))
+        for i in range(r):
+            average[:, :, i] = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+        
+        # average over initial conditions and normalise w.r.t chosen t0
+        avgSk = np.sum(average, axis=2)/r
+        avgSk_norm = avgSk / avgSk[:, 1][:, None]
+        
+        
+        et = time.time() # end time
+        elapsed_time = et - st
+        
+        tarray[j, i] = elapsed_time
+    
+        j += 1
+    i += 1
+
+fig = plt.figure(figsize=(10, 7))
+ax = fig.gca()
+ax.tick_params(labelsize=22)
+ax.set_xlabel(r"$Repetitions$", fontsize=22)
+ax.set_ylabel(r"$N$", fontsize=22)
+ax.set_zlabel(r"$t [s]$", fontsize=22)
+
+ax.pcolormesh(reps, N_vals, tarray, cmap="Greys")
