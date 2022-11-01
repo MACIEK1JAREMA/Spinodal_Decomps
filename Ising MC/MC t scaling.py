@@ -85,7 +85,7 @@ for N in N_vals:
     
     average = np.zeros((k_num, mcss, reps))
     for i in range(reps):
-        average[:, :, i] = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+        average[:, :, i], kmax = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
     
     # average over initial conditions and normalise w.r.t chosen t0
     avgSk = np.sum(average, axis=2)/reps

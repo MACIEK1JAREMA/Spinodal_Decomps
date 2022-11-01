@@ -8,7 +8,7 @@ Created on Tue Nov  1 15:12:56 2022
 import numpy as np
 import matplotlib.pyplot as plt
 
-def gradient(x,y):
+def gradient(x, y):
     """
     Inputs : x,y, two 1D arrays of the same length
     
@@ -41,7 +41,7 @@ def gradient(x,y):
     #print("intercept is: {0:.6f} +/- {1:.6f}". format(c,sigmac))
 
     # Plot points and error bars. Plot points as a '.', colours set to black
-    plt.errorbar(x,y, yerr=yerror, fmt='.', color='k', capsize=2, ecolor='k')
+    #plt.errorbar(x,y, yerr=yerror, fmt='.', color='k', capsize=2, ecolor='k')
 
     # Plot line of best fit
     #plt.plot(x,m*x+c, color='k')
@@ -49,10 +49,11 @@ def gradient(x,y):
     return m # return gradient 
 
 
-# Sample data to test function
-x = np.linspace(1,100) 
-y = 3*x**2 + np.random.rand(len(x))/100
-lnx = np.log(x)
-lny = np.log(y)
-z = gradient(x,y)
+if __name__ is "__main__":
+    # Sample data to test function
+    x = np.linspace(1,100) 
+    y = 3*x**2 + np.random.rand(len(x))/100
+    lnx = np.log(x)
+    lny = np.log(y)
+    z = gradient(x,y)
 
