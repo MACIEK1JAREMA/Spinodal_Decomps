@@ -225,6 +225,7 @@ def MC_frust(N, Jnn, Jnnn, T, t0, tm, nth=1, seed=None):
     
     return configs
 
+
 def annulus_avg(ft, N, dk):
     """
     Finds average of function from fourier transform in k space
