@@ -29,10 +29,18 @@ def annulus_avg(ft, N, dk):
         rows = indices[:,0]
         columns = indices[:,1]
         
-        # find average of all of those
-        average[j] = np.mean(abs(ft[rows, columns]))
+        # find average of all of those up to cutoff frequency
+        if len(indices) != 0:
+            average[j] = np.mean(abs(ft[rows, columns]))
+        else:
+            k_max = k
+            break
     
-    return average, kvals
+    # cut data upto k_max only, average stays same size with zeros after
+    # cut off k
+    kvals = kvals[:k_max]
+    
+    return average, kvals, k_max
 
 
 # %%
@@ -85,7 +93,8 @@ for i in range(len(configs[0, 0, :])):
     
     # Finding average for k over multiple radii
     dk = 1
-    average, kvals = annulus_avg(ft, N, dk)
+    average, kvals, kmax = annulus_avg(ft*np.conj(ft), N, dk)
+    average = average[:kmax]
     
     # plot for all different MCS
     if i == 0:

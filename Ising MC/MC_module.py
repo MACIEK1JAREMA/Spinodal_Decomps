@@ -251,15 +251,23 @@ def annulus_avg(ft, N, dk):
         # get square radius
         dist_sq = kx**2 + ky**2
         
-        # Get all values in [k, k+dk]    
+        # Get all values in [k, k+dk]
         indices = np.argwhere((dist_sq >= k**2) & (dist_sq < (k+dk)**2))
-        rows = indices[:,0]
-        columns = indices[:,1]
+        rows = indices[:, 0]
+        columns = indices[:, 1]
         
-        # find average of all of those
-        average[j] = np.mean(abs(ft[rows, columns]))
+        # find average of all of those up to cutoff frequency
+        if len(indices) != 0:
+            average[j] = np.mean(abs(ft[rows, columns]))
+        else:
+            k_max = k
+            break
     
-    return average, kvals
+    # cut data upto k_max only, average stays same size with zeros after
+    # cut off k
+    kvals = kvals[:k_max]
+    
+    return average, kvals, k_max
 
 
 def Sk_MCrun(N, J, T, dk, t0, tm, nth):
@@ -271,6 +279,7 @@ def Sk_MCrun(N, J, T, dk, t0, tm, nth):
     
     # Calculating structure factor for various time steps
     k_num = len(np.arange(0, N, dk))
+    kmax = np.zeros((len(configs[0, 0, :])))
     average = np.zeros((k_num, len(configs[0, 0, :])))
     for i in range(len(configs[0, 0, :])):
         # Lattice spins FT
@@ -279,10 +288,14 @@ def Sk_MCrun(N, J, T, dk, t0, tm, nth):
         ft = np.fft.fftshift(ft)
         
         # Finding average for k over multiple radii
-        av, _ = annulus_avg(ft, N, dk)
-        average[:, i] = av
+        av, kvals, km = annulus_avg(ft*np.conj(ft), N, dk)
+        kmax[i] = km
+        
+        # add zeros to average so that it retains right shape:
+        avg = np.append(av, np.zeros(( len(average[:, 0]) - len(av) )))
+        average[:, i] = avg
     
-    return average
+    return average, kmax
 
 
 def Sk_MCrun_ani(N, Jx, Jy, T, dk, t0, tm, nth):
@@ -301,10 +314,10 @@ def Sk_MCrun_ani(N, Jx, Jy, T, dk, t0, tm, nth):
         ft = np.fft.fftshift(ft)
         
         # Finding average for k over multiple radii
-        av, _ = annulus_avg(ft, N, dk)
+        av, kvals, kmax = annulus_avg(ft*np.conj(ft), N, dk)
         average[:, i] = av
     
-    return average
+    return average, kmax
 
 
 def Sk_MCrun_frust(N, Jnn, Jnnn, T, dk, t0, tm, nth):
@@ -323,10 +336,10 @@ def Sk_MCrun_frust(N, Jnn, Jnnn, T, dk, t0, tm, nth):
         ft = np.fft.fftshift(ft)
         
         # Finding average for k over multiple radii
-        av, _ = annulus_avg(ft, N, dk)
+        av, kvals, kmax = annulus_avg(ft*np.conj(ft), N, dk)
         average[:, i] = av
     
-    return average
+    return average, kmax
 
 
 # %%
@@ -426,3 +439,46 @@ if __name__ == "__main__":
     for t in range(len(configs[0, 0, :])):
         ax.imshow(configs[:, :, t], cmap='Greys', vmin=-1, vmax=1, interpolation=None)
         plt.pause(0.01)
+
+# %%
+
+# TEST of anulkus average with kmax included
+
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    # set up lattice and variables
+    N = 128
+    
+    J = 1
+    Tc = 2.2692*J
+    T = 0.1*Tc
+    t0 = 5  # at least 1 (0th saved automatically anyway!)
+    tm = 90
+    
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.gca()
+    ax.tick_params(labelsize=16)
+    ax.set_xticks(np.arange(0, N+1, int(N/5)))
+    ax.set_yticks(np.arange(0, N+1, int(N/5)))
+    
+    nth = 15
+    configs = MC(N, J, T, t0, tm, nth=nth)
+    
+    # animate it:
+    for t in range(len(configs[0, 0, :])):
+        print('showing '+ str(t))
+        ax.imshow(configs[:, :, t], cmap='Greys', vmin=-1, vmax=1, interpolation=None)
+        plt.pause(0.5)
+    
+    # Lattice spins FT
+    ft = np.fft.ifftshift(configs[:, :, -3])
+    ft = np.fft.fft2(ft)
+    ft = np.fft.fftshift(ft)
+    dk = 1
+    # Finding average for k over multiple radii
+    av, kvals, kmax = annulus_avg(ft*np.conj(ft), N, dk)
+
+
+
+
