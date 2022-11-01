@@ -1,0 +1,15 @@
+Tuesday 01/11    Extract z from average, plot S(k,t)
+Wednesday 02/11  Extract z from average, plot S(k,t)
+Thursday 03/11   Extract z from average, plot S(k,t)
+Friday 04/11     Extract z from average, plot S(k,t)
+Saturday 05/11   Figure Production
+Sunday 06/11     Figure Production, Presentation/Report
+Monday 07/11     Presentation/Report
+Tuesday 08/11    Presentation/Report
+Wednesday 09/11  Presentation/Report
+Thursday 10/11   Presentation/Report
+
+Maciek - extractin Z, plotting S(k,t)
+Will - extracting Z from a log-log plot
+Joe - Presentation, Landau-Ginzburg theory section
+Aden - Report introduction, presentation applications
