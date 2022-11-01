@@ -20,20 +20,95 @@ def annulus_average(ft, N, k1, dk):
     average = np.mean(abs(ft[rows, columns]))
     return average
 
+
 if __name__ == "__main__":
     # Set up lattice
     grid_size = 128
     grid_spacing = 1
-    grid = np.random.rand(grid_size,grid_size)*2 - 1
     
     # Time array
     tmax = 50
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
-    # Evolves the lattice over time. "driving" adds the driving term if True
-    phi = solver(grid, t_array, grid_size, grid_spacing, driving=True)
+    num_repeats = 5
     
+    # Variables and array for structure factor
+    dk = 1
+    kvals = np.arange(0, grid_size, dk)
+    interval = 128
+    sf_times = t_array[::interval]
+    sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
+    
+    for repeat in range(num_repeats):
+        print("Repeat number "+str(repeat+1))
+        grid = np.random.rand(grid_size,grid_size)*2 - 1
+        
+        # Evolves the lattice over time. "driving" adds the driving term if True
+        phi = solver(grid, t_array, grid_size, grid_spacing, driving=True)
+        
+        # States to analyse structure factor for
+        sf_states = phi[::interval]
+        
+        for i, time_and_state in enumerate(zip(sf_times, sf_states)):
+            time = time_and_state[0]
+            state = time_and_state[1]
+            
+            # Fourier transform of the lattice
+            ft = np.fft.ifftshift(state)
+            ft = np.fft.fft2(ft)
+            ft = np.fft.fftshift(ft)
+            
+            # Preparing structure factor array
+            sf[repeat][i] = np.zeros(len(ft))
+            
+            # Calculating structure factor
+            for j, k in enumerate(kvals):
+                sf[repeat][i][j] = annulus_average(ft, grid_size, k, dk)
+            
+            # Normalising structure factor
+            sf[repeat][i] = sf[repeat][i]/sf[repeat][0]
+    
+    # Averaging structure factor over each repeat and plotting
+    # Plot 1 - no time adjustment
+    # Plot 2 - Multiplying k by sqrt(t)
+    # Plot 3 - Dividing k by sqrt(t)
+    averaged_sf = np.mean(sf, axis=0)
+    fig_sf, ax_sf = plt.subplots(1, 3, figsize=(16,8))
+    plt.subplots_adjust(wspace=0.4, hspace=0.4, top=0.85)
+    fig_sf.suptitle("Structure Factor (averaged over "+str(num_repeats)+" repeats)", fontsize=20)
+    ax_sf[0].set_xlabel("$|k|$", fontsize=16)
+    ax_sf[0].set_ylabel("S($|k|$)", fontsize=16)
+    ax_sf[1].set_xlabel("$|k|t^\\frac{1}{2}$", fontsize=16)
+    ax_sf[1].set_ylabel("S($|k|$)$/t^\\frac{3}{2}$", fontsize=16)
+    ax_sf[2].set_xlabel("$|k|/t^\\frac{1}{2}$", fontsize=16)
+    ax_sf[2].set_ylabel("S($|k|$)$t^\\frac{3}{2}$", fontsize=16)
+    
+    for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
+        ax_sf[0].plot(kvals, structure_factor, label="$t$="+str(np.round(time,0)))
+        ax_sf[1].plot(kvals*(time**0.5), structure_factor/(time**1.5), label="$t$="+str(np.round(time,0)))
+        ax_sf[2].plot(kvals/(time**0.5), structure_factor*(time**1.5), label="$t$="+str(np.round(time,0)))
+    ax_sf[0].legend()
+    ax_sf[1].legend()
+    ax_sf[2].legend()
+        
+    # Displays the final state
+    fig_phi = plt.figure(figsize=(8,6))
+    ax_phi = fig_phi.gca()
+    ax_phi.set_title("Landau-Ginzburg Equation Evolution\nN="+str(grid_size)+", $t$="+\
+                     str(tmax)+" seconds", fontsize=16)
+    
+    img_phi = ax_phi.imshow(phi[-1], cmap="Greys", vmin=-1, vmax=1)
+    
+    cax = fig_phi.add_axes([0.2, 0.1, 0.8, 0.8])
+    cax.get_xaxis().set_visible(False)
+    cax.get_yaxis().set_visible(False)
+    cax.patch.set_alpha(0)
+    cax.set_frame_on(False)
+    fig_phi.colorbar(img_phi, orientation='vertical')
+    plt.show()
+    
+#%%
     # Calculating and plotting structure factor for various time steps
     fig_sf = plt.figure(figsize=(8,6))
     ax_sf = fig_sf.gca()
@@ -94,19 +169,6 @@ if __name__ == "__main__":
     cax.patch.set_alpha(0)
     cax.set_frame_on(False)
     fig_phi.colorbar(img_phi, orientation='vertical')
-    
-    # Displaying the Fourier transform
-    fig_ft = plt.figure(figsize=(8,6))
-    ax_ft = fig_ft.gca()
-    
-    img_ft = ax_ft.imshow(abs(ft), cmap="Greys")
-    
-    cax = fig_ft.add_axes([0.2, 0.1, 0.8, 0.8])
-    cax.get_xaxis().set_visible(False)
-    cax.get_yaxis().set_visible(False)
-    cax.patch.set_alpha(0)
-    cax.set_frame_on(False)
-    fig_ft.colorbar(img_ft, orientation='vertical')
     
     '''
     Remarks:
