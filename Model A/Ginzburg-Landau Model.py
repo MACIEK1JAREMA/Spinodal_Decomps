@@ -20,7 +20,6 @@ def annulus_average(ft, N, k1, dk):
     average = np.mean(abs(ft[rows, columns]))
     return average
 
-
 if __name__ == "__main__":
     # Set up lattice
     grid_size = 128
@@ -80,14 +79,14 @@ if __name__ == "__main__":
     ax_sf[0].set_xlabel("$|k|$", fontsize=16)
     ax_sf[0].set_ylabel("S($|k|$)", fontsize=16)
     ax_sf[1].set_xlabel("$|k|t^\\frac{1}{2}$", fontsize=16)
-    ax_sf[1].set_ylabel("S($|k|$)$/t^\\frac{3}{2}$", fontsize=16)
-    ax_sf[2].set_xlabel("$|k|/t^\\frac{1}{2}$", fontsize=16)
-    ax_sf[2].set_ylabel("S($|k|$)$t^\\frac{3}{2}$", fontsize=16)
+    ax_sf[1].set_ylabel("$\\frac{S(|k|)}{t}$", fontsize=16)
+    ax_sf[2].set_xlabel("$\\frac{|k|}{t^\\frac{1}{2}}$", fontsize=16)
+    ax_sf[2].set_ylabel("S($|k|$)$t$", fontsize=16)
     
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
         ax_sf[0].plot(kvals, structure_factor, label="$t$="+str(np.round(time,0)))
-        ax_sf[1].plot(kvals*(time**0.5), structure_factor/(time**1.5), label="$t$="+str(np.round(time,0)))
-        ax_sf[2].plot(kvals/(time**0.5), structure_factor*(time**1.5), label="$t$="+str(np.round(time,0)))
+        ax_sf[1].plot(kvals*(time**0.5), structure_factor/(time), label="$t$="+str(np.round(time,0)))
+        ax_sf[2].plot(kvals/(time**0.5), structure_factor*(time), label="$t$="+str(np.round(time,0)))
     ax_sf[0].legend()
     ax_sf[1].legend()
     ax_sf[2].legend()
