@@ -17,29 +17,29 @@ N = 256
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 1
-tm = 50
-nth = 2
+t0 = 40
+tm = 300
+nth = 20
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
 
 # set up arrays and length values:
-kvals = np.arange(0, N, dk)
+kvals = np.arange(1, int(N/2), dk)
 mcss = int(np.floor((tm-t0)/nth)) + 2
-k_num = len(np.arange(0, N, dk))
+k_num = len(np.arange(1, int(N/2), dk))
 
 # find circularly averages S(kx, ky) = S(k) for each MCS of each initial
 # realisation and store in 3D array
 average = np.zeros((k_num, mcss, reps))
 for i in range(reps):
-    average[:, :, i], kmax = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+    average[:, :, i] = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
 
 
 # average over initial conditions and normalise w.r.t chosen t0
 avgSk = np.sum(average, axis=2)/reps
 avgSk_norm = avgSk / avgSk[:, 0][:, None]
-avgSk_norm = np.nan_to_num(avgSk_norm, 0)
+#avgSk_norm = np.nan_to_num(avgSk_norm, 0)
 
 ## plot resulting S(k) at each t step
 #figSn = plt.figure(figsize=(8, 6))
@@ -101,3 +101,28 @@ for i in range(0, len(avgSk_norm[0, :])):
         time = str(int(nth*(i-1) + t0)) + " MCS"
         
     axUni.plot(kvals*t_vals[i]**m1, avgSk_norm[:, i]/t_vals[i]**(-2*m1), label=r"$t=$"+time)
+
+# %%
+
+figUni = plt.figure(figsize=(10, 7))
+axUni = figUni.gca()
+axUni.tick_params(labelsize=22)
+
+
+N = 128
+J = 1
+Tc = 2.2692*J
+T = 0.1*Tc
+t0 = 1
+tm = 250
+nth = 10
+
+
+configs = MC.MC(N, J, T, t0, tm, nth=nth)
+# Lattice spins FT
+ft = np.fft.ifftshift(configs[:, :, 20])
+ft = np.fft.fft2(ft)
+ft = np.fft.fftshift(ft)
+ftsq = np.real(ft*np.conj(ft))
+
+axUni.imshow(ftsq)

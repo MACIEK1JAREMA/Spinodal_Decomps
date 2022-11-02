@@ -67,7 +67,7 @@ def MC(N, J, T, t0, tm, nth=1):
             # otherwise do nothing
         # save configuration from this MCS:
         if t >= t0 and (t-t0) % nth == 0:
-            configs[:, :, int(t/nth)+1] = lat
+            configs[:, :, int((t-t0)/nth)+1] = lat
     
     return configs
 
@@ -226,6 +226,7 @@ def MC_frust(N, Jnn, Jnnn, T, t0, tm, nth=1, seed=None):
     return configs
 
 
+#@jit(nopython=True)
 def annulus_avg(ft, N, dk):
     """
     Finds average of function from fourier transform in k space
@@ -238,7 +239,7 @@ def annulus_avg(ft, N, dk):
     -- dk - int - k space step
     """
     
-    kvals = np.arange(0, N, dk)
+    kvals = np.arange(1, int(N/2), dk)
     average = np.zeros(len(kvals))
     
     for j, k in enumerate(kvals):
@@ -257,17 +258,9 @@ def annulus_avg(ft, N, dk):
         columns = indices[:, 1]
         
         # find average of all of those up to cutoff frequency
-        if len(indices) != 0:
-            average[j] = np.mean(abs(ft[rows, columns]))
-        else:
-            k_max = k
-            break
+        average[j] = np.mean(abs(ft[rows, columns]))
     
-    # cut data upto k_max only, average stays same size with zeros after
-    # cut off k
-    kvals = kvals[:k_max]
-    
-    return average, kvals, k_max
+    return average, kvals
 
 
 def Sk_MCrun(N, J, T, dk, t0, tm, nth):
@@ -278,8 +271,7 @@ def Sk_MCrun(N, J, T, dk, t0, tm, nth):
     configs = MC(N, J, T, t0, tm, nth=nth)
     
     # Calculating structure factor for various time steps
-    k_num = len(np.arange(0, N, dk))
-    kmax = np.zeros((len(configs[0, 0, :])))
+    k_num = len(np.arange(1, int(N/2), dk))
     average = np.zeros((k_num, len(configs[0, 0, :])))
     for i in range(len(configs[0, 0, :])):
         # Lattice spins FT
@@ -288,14 +280,10 @@ def Sk_MCrun(N, J, T, dk, t0, tm, nth):
         ft = np.fft.fftshift(ft)
         
         # Finding average for k over multiple radii
-        av, kvals, km = annulus_avg(ft*np.conj(ft), N, dk)
-        kmax[i] = km
-        
-        # add zeros to average so that it retains right shape:
-        avg = np.append(av, np.zeros(( len(average[:, 0]) - len(av) )))
-        average[:, i] = avg
+        av, kvals = annulus_avg(np.real(ft*np.conj(ft)), N, dk)
+        average[:, i] = av
     
-    return average, kmax
+    return average
 
 
 def Sk_MCrun_ani(N, Jx, Jy, T, dk, t0, tm, nth):
@@ -363,7 +351,7 @@ if __name__ == "__main__":
     Tc = 2.2692*J
     T = 0.1*Tc
     t0 = 1  # at least 1 (0th saved automatically anyway!)
-    tm = 5
+    tm = 20
     
     fig = plt.figure(figsize=(10, 7))
     ax = fig.gca()
