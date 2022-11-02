@@ -13,13 +13,13 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 256
+N = 1024
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 40
-tm = 300
-nth = 20
+t0 = 100
+tm = 600
+nth = 40
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
@@ -34,6 +34,7 @@ k_num = len(np.arange(1, int(N/2), dk))
 average = np.zeros((k_num, mcss, reps))
 for i in range(reps):
     average[:, :, i] = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+    print("Finished repetition" + str(i))
 
 
 # average over initial conditions and normalise w.r.t chosen t0
