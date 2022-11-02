@@ -13,19 +13,19 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 1024
+N = 128
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 100
-tm = 600
-nth = 40
+t0 = 30
+tm = 100
+nth = 5
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
 
 # set up arrays and length values:
-kvals = np.arange(1, int(N/2), dk)
+#kvals = 2*np.pi/np.arange(1, int(N/2), dk)
 mcss = int(np.floor((tm-t0)/nth)) + 2
 k_num = len(np.arange(1, int(N/2), dk))
 
@@ -33,8 +33,8 @@ k_num = len(np.arange(1, int(N/2), dk))
 # realisation and store in 3D array
 average = np.zeros((k_num, mcss, reps))
 for i in range(reps):
-    average[:, :, i] = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
-    print("Finished repetition" + str(i))
+    average[:, :, i], kvals = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+    print("Finished repetition " + str(i))
 
 
 # average over initial conditions and normalise w.r.t chosen t0
@@ -62,7 +62,7 @@ print('Time: ', stop - start)
 
 # find average k from it and get L
 k_vals = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
-k = np.sum(avgSk_norm*k_vals**2, axis=0)/np.sum(avgSk_norm*k_vals, axis=0)
+k = 2*np.pi*np.sum(avgSk_norm*k_vals**2*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk, axis=0)
 L = 2*np.pi/k
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
