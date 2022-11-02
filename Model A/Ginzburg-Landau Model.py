@@ -34,6 +34,7 @@ if __name__ == "__main__":
     
     # Variables and array for structure factor
     dk = 1
+        # Should range up to N/2
     kvals = np.arange(0, grid_size, dk)
     interval = 128
     sf_times = t_array[::interval]
