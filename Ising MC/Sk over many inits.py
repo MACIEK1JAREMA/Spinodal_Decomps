@@ -13,13 +13,13 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 128
+N = 1014
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 50
-tm = 300
-nth = 20
+t0 = 100
+tm = 600
+nth = 50
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
@@ -103,7 +103,7 @@ for i in range(0, len(avgSk_norm[0, :])):
     else:
         time = str(int(nth*(i-1) + t0)) + " MCS"
     
-    axUni.plot(kvals*t_vals[i]**0.5, avgSk_norm[:, i]/t_vals[i]**(2*0.5), label=r"$t=$"+time)
+    axUni.plot(kvals*t_vals[i]**m1, avgSk_norm[:, i]/t_vals[i]**(2*m1), label=r"$t=$"+time)
 
 # %%
 
