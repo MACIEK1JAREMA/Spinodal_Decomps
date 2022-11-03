@@ -17,9 +17,9 @@ N = 128
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 30
-tm = 100
-nth = 5
+t0 = 50
+tm = 300
+nth = 20
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
@@ -40,7 +40,9 @@ for i in range(reps):
 # average over initial conditions and normalise w.r.t chosen t0
 avgSk = np.sum(average, axis=2)/reps
 avgSk_norm = avgSk / avgSk[:, 0][:, None]
-#avgSk_norm = np.nan_to_num(avgSk_norm, 0)
+avgSk_norm = np.nan_to_num(avgSk_norm, 0)
+
+#avgSk_norm = np.sum(average, axis=2)/reps
 
 ## plot resulting S(k) at each t step
 #figSn = plt.figure(figsize=(8, 6))
@@ -100,8 +102,8 @@ for i in range(0, len(avgSk_norm[0, :])):
         time = "0 MCS"
     else:
         time = str(int(nth*(i-1) + t0)) + " MCS"
-        
-    axUni.plot(kvals*t_vals[i]**m1, avgSk_norm[:, i]/t_vals[i]**(-2*m1), label=r"$t=$"+time)
+    
+    axUni.plot(kvals*t_vals[i]**0.5, avgSk_norm[:, i]/t_vals[i]**(2*0.5), label=r"$t=$"+time)
 
 # %%
 
