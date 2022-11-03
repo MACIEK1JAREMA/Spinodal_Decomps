@@ -33,7 +33,7 @@ if __name__ == "__main__":
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
-    num_repeats = 10
+    num_repeats = 1
     
     # Variables and array for structure factor
     dk = 1
@@ -81,6 +81,10 @@ if __name__ == "__main__":
     ax_sf.set_ylabel("$\\frac{S(|k|)}{t}$", fontsize=16)
     
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
+        
+        structure_factor = structure_factor/averaged_sf[0]
+        k = 2*np.pi*(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
+        
         ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))
     ax_sf.legend()
         
@@ -109,30 +113,18 @@ if __name__ == "__main__":
 from scipy.optimize import curve_fit
 
 if __name__ == "__main__":
-    index = 32
-    # Truncated array to avoid t=0 due to -inf error with SciPy
-    init_sf = np.zeros(len(averaged_sf[1:]))
+    # Wrong size broadcasting
+    k = 2*np.pi*(averaged_sf*kvals**2*dk)/np.sum(averaged_sf*kvals*dk)
+    L = 2*np.pi/k
     
-    for i, sf in enumerate(averaged_sf[1:]):
-        init_sf[i] = sf[index]
-
-    log_sf = np.log(init_sf)
-    log_time = np.log(sf_times[1:])
-    
-    def func(x, a, b):
-        return a*x + b
-    param, _ = curve_fit(lambda x, a, b: a*x + b, log_time[16:], log_sf[16:])
-    fitted_curve = param[0]*log_time + param[1]
+    log_time = np.log(sf_times)
+    log_l = np.log(L)
     
     fig_log = plt.figure(figsize=(8,6))
     ax_log = fig_log.gca()
-    ax_log.plot(log_time, log_sf, "kx")
-    ax_log.plot(log_time[16:], fitted_curve[16:], "r--")
+    ax_log.plot(log_time, log_l, "kx")
     ax_log.set_xlabel("$\\log(t)$", fontsize=16)
     ax_log.set_ylabel("log[S($k=0,t$)]", fontsize=16)
-    ax_log.set_title("S.F vs Time for $k="+str(kvals[index])+"$", fontsize=20)
-    
-    print("Slope was determined to be "+str(param[0]))
     
     
 #%%
