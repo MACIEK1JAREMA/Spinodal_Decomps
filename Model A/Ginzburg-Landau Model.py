@@ -10,14 +10,17 @@ def annulus_average(ft, N, k1, dk):
     
     sum_of_squares = kx**2 + ky**2
     
-    # Grabbing all Fourier transform values between two radii
+    # Grabbing all |Fourier transform|^2 values between two radii
     k2 = k1 + dk
     
     indices = np.argwhere((sum_of_squares >= k1**2) & (sum_of_squares < k2**2))
     rows = indices[:,0]
     columns = indices[:,1]
     
-    average = np.mean(abs(ft[rows, columns]))
+    sf = ft * np.conj(ft) # Square magnitude
+
+    average = np.mean(sf[rows, columns]) # returns slope ~ 0.66
+    # average = np.sum(k1*sf[rows, columns])/np.sum(sf[rows, columns]) # returns slope ~0
     return average
 
 if __name__ == "__main__":
@@ -26,17 +29,17 @@ if __name__ == "__main__":
     grid_spacing = 1
     
     # Time array
-    tmax = 50
+    tmax = 100
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
-    num_repeats = 5
+    num_repeats = 10
     
     # Variables and array for structure factor
     dk = 1
-        # Should range up to N/2
-    kvals = np.arange(0, grid_size, dk)
-    interval = 128
+    # k ranges from 1 to N/2
+    kvals = np.arange(1, int(grid_size/2), dk)
+    interval = 32
     sf_times = t_array[::interval]
     sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
     
@@ -59,8 +62,8 @@ if __name__ == "__main__":
             ft = np.fft.fft2(ft)
             ft = np.fft.fftshift(ft)
             
-            # Preparing structure factor array
-            sf[repeat][i] = np.zeros(len(ft))
+            # Preparing structure factor array for each value of k
+            sf[repeat][i] = np.zeros(len(kvals))
             
             # Calculating structure factor
             for j, k in enumerate(kvals):
@@ -70,27 +73,16 @@ if __name__ == "__main__":
             sf[repeat][i] = sf[repeat][i]/sf[repeat][0]
     
     # Averaging structure factor over each repeat and plotting
-    # Plot 1 - no time adjustment
-    # Plot 2 - Multiplying k by sqrt(t)
-    # Plot 3 - Dividing k by sqrt(t)
     averaged_sf = np.mean(sf, axis=0)
-    fig_sf, ax_sf = plt.subplots(1, 3, figsize=(16,8))
-    plt.subplots_adjust(wspace=0.4, hspace=0.4, top=0.85)
-    fig_sf.suptitle("Structure Factor (averaged over "+str(num_repeats)+" repeats)", fontsize=20)
-    ax_sf[0].set_xlabel("$|k|$", fontsize=16)
-    ax_sf[0].set_ylabel("S($|k|$)", fontsize=16)
-    ax_sf[1].set_xlabel("$|k|t^\\frac{1}{2}$", fontsize=16)
-    ax_sf[1].set_ylabel("$\\frac{S(|k|)}{t}$", fontsize=16)
-    ax_sf[2].set_xlabel("$\\frac{|k|}{t^\\frac{1}{2}}$", fontsize=16)
-    ax_sf[2].set_ylabel("S($|k|$)$t$", fontsize=16)
+    fig_sf = plt.figure(figsize=(10,8))
+    ax_sf = fig_sf.gca()
+    ax_sf.set_title("Structure Factor (averaged over "+str(num_repeats)+" repeats)", fontsize=20)
+    ax_sf.set_xlabel("$|k|t^{\\frac{1}{2}}$", fontsize=16)
+    ax_sf.set_ylabel("$\\frac{S(|k|)}{t}$", fontsize=16)
     
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
-        ax_sf[0].plot(kvals, structure_factor, label="$t$="+str(np.round(time,0)))
-        ax_sf[1].plot(kvals*(time**0.5), structure_factor/(time), label="$t$="+str(np.round(time,0)))
-        ax_sf[2].plot(kvals/(time**0.5), structure_factor*(time), label="$t$="+str(np.round(time,0)))
-    ax_sf[0].legend()
-    ax_sf[1].legend()
-    ax_sf[2].legend()
+        ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))
+    ax_sf.legend()
         
     # Displays the final state
     fig_phi = plt.figure(figsize=(8,6))
@@ -107,6 +99,41 @@ if __name__ == "__main__":
     cax.set_frame_on(False)
     fig_phi.colorbar(img_phi, orientation='vertical')
     plt.show()
+    
+#%%
+# Finding gradient of SF(k=0) vs time
+
+# Plots currently change depending on what time, indicating that the axis scaling
+# isn't quite right
+
+from scipy.optimize import curve_fit
+
+if __name__ == "__main__":
+    index = 32
+    # Truncated array to avoid t=0 due to -inf error with SciPy
+    init_sf = np.zeros(len(averaged_sf[1:]))
+    
+    for i, sf in enumerate(averaged_sf[1:]):
+        init_sf[i] = sf[index]
+
+    log_sf = np.log(init_sf)
+    log_time = np.log(sf_times[1:])
+    
+    def func(x, a, b):
+        return a*x + b
+    param, _ = curve_fit(lambda x, a, b: a*x + b, log_time[16:], log_sf[16:])
+    fitted_curve = param[0]*log_time + param[1]
+    
+    fig_log = plt.figure(figsize=(8,6))
+    ax_log = fig_log.gca()
+    ax_log.plot(log_time, log_sf, "kx")
+    ax_log.plot(log_time[16:], fitted_curve[16:], "r--")
+    ax_log.set_xlabel("$\\log(t)$", fontsize=16)
+    ax_log.set_ylabel("log[S($k=0,t$)]", fontsize=16)
+    ax_log.set_title("S.F vs Time for $k="+str(kvals[index])+"$", fontsize=20)
+    
+    print("Slope was determined to be "+str(param[0]))
+    
     
 #%%
     # Calculating and plotting structure factor for various time steps
