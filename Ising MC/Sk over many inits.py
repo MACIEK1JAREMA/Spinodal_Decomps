@@ -13,13 +13,13 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 1024
+N = 256
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 100
-tm = 600
-nth = 50
+t0 = 20
+tm = 100
+nth = 40
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
@@ -36,28 +36,6 @@ for i in range(reps):
     average[:, :, i], kvals = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
     print("Finished repetition " + str(i))
 
-
-# average over initial conditions and normalise w.r.t chosen t0
-avgSk = np.sum(average, axis=2)/reps
-avgSk_norm = avgSk / avgSk[:, 0][:, None]
-avgSk_norm = np.nan_to_num(avgSk_norm, 0)
-
-#avgSk_norm = np.sum(average, axis=2)/reps
-
-## plot resulting S(k) at each t step
-#figSn = plt.figure(figsize=(8, 6))
-#axSn = figSn.gca()
-#axSn.tick_params(labelsize=22)
-#axSn.set_xlabel(r"$k$", fontsize=22)
-#axSn.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
-#
-#for i in range(1, len(avgSk_norm[0, :])):
-#    time = str(int(nth*(i-1) + t0)) + " MCS"
-#    axSn.plot(kvals, avgSk_norm[:, i], label=r"$t=$"+time)
-#
-#
-#axSn.legend(fontsize=22)
-
 # return time to run
 stop = timeit.default_timer()
 print('Time: ', stop - start)
@@ -67,15 +45,24 @@ print('Time: ', stop - start)
 
 # ANALYSIS
 
+# average over initial conditions and normalise w.r.t chosen t0
+avgSk = np.sum(average, axis=2)/reps
+avgSk_norm = avgSk / avgSk[:, 0][:, None]
+#avgSk_norm = np.nan_to_num(avgSk_norm, 0)
+
+
 moment = 1
+
+
+kvals = (2*np.pi/N)*np.arange(1, int(N/2), dk)
 
 # find average k from it and get L
 k_vals = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
 k = np.sum(avgSk_norm*k_vals**(moment+1)*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk, axis=0)
 L = (2*np.pi/k)**(1/moment)
 
-k = np.sum(avgSk_norm*k_vals*dk, axis=0)/np.sum(avgSk_norm*dk, axis=0)
-L = (2*np.pi/k)**(1/moment)
+#k = np.sum(avgSk_norm*k_vals*dk, axis=0)/np.sum(avgSk_norm*dk, axis=0)
+#L = (2*np.pi/k)**(1/moment)
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
 
@@ -105,15 +92,23 @@ axUni.tick_params(labelsize=22)
 axUni.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
 axUni.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
 
-t_vals = np.append(np.array([0]), t_vals)
 
-for i in range(0, len(avgSk_norm[0, :])):
-    if i == 0:
-        time = "0 MCS"
-    else:
-        time = str(int(nth*(i-1) + t0)) + " MCS"
-    
-    axUni.plot(kvals*t_vals[i]**m1, avgSk_norm[:, i]/t_vals[i]**(2*m1), label=r"$t=$"+time)
+for i in range(1, len(avgSk_norm[0, :])):
+    time = str(int(nth*(i-1) + t0)) + " MCS"
+    axUni.plot(kvals*t_vals[i-1]**m1, avgSk_norm[:, i]/t_vals[i-1]**(2*m1), label=r"$t=$"+time)
+
+
+## plot resulting S(k) at each t step
+#figSn = plt.figure(figsize=(8, 6))
+#axSn = figSn.gca()
+#axSn.tick_params(labelsize=22)
+#axSn.set_xlabel(r"$k$", fontsize=22)
+#axSn.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
+#
+#for i in range(1, len(avgSk_norm[0, :])):
+#    time = str(int(nth*(i-1) + t0)) + " MCS"
+#    axSn.plot(kvals, avgSk_norm[:, i], label=r"$t=$"+time)
+#axSn.legend(fontsize=22)
 
 # %%
 

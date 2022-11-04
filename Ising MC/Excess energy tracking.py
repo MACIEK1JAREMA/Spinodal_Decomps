@@ -4,11 +4,11 @@ import numpy as np
 from numba import jit
 
 
-@jit(nopython=True)
+#@jit(nopython=True)
 def MC_DE(N, J, T, t0, tm, nth=1):
     """
     Function to simulate Monte Carlo simulation of 2D Ising Model
-    while tracking excess energy  per spin from domain walls by surface tension
+    while tracking energy.
     
     Params:
       ---------------------------
@@ -21,7 +21,7 @@ def MC_DE(N, J, T, t0, tm, nth=1):
     
     Returns:
         ----------------------
-    -- excess_tot -- np.ndarray - array of excess energy per spin after each
+    -- E_tot -- np.ndarray - array of total system energy at
                                 saved MCS (nth in t0 to tm)
     -- times -- np.ndarray - times at which the system excess energy was saved.
     """
@@ -45,21 +45,12 @@ def MC_DE(N, J, T, t0, tm, nth=1):
     nn_l = nn_t.T
     
     # find it's total energy to begin with:
-    E_init = J*(np.sum( lat * (lat[nn_t, :] + lat[nn_b, :] + lat[:, nn_r] + lat[:, nn_l] )))
-    
-    # or using loops:
-    E_init = 0
-    for i in range(N):
-        for j in range(N):
-            E_init += 2*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
-            
-    # ghet excess per spin from domain walls
-    excess_init = 2*J - E_init/N  # per spin
+    E_init = 2*J*(np.sum( lat * (lat[nn_t, :] + lat[nn_b, :] + lat[:, nn_r] + lat[:, nn_l] )))
     
     # perp arrays to save results:
-    excess_tot = np.zeros((num+1))
-    excess_tot[0] = excess_init
-    times = []  # times that end up being saved
+    E_tot = np.zeros((num+1))
+    E_tot[0] = E_init
+    times = np.array([0])  # times that end up being saved
     
     # look over all MCS times with N^2 attempts of flip on each run
     for t in range(1, tm+1):
@@ -73,17 +64,16 @@ def MC_DE(N, J, T, t0, tm, nth=1):
             r = np.exp(-dE/T)
             if r > z[0, (t-t0)*n + n]:
                 lat[i, j] *= -1
-                E_change += dE  # update total energy
+                E_change -=  dE # update total energy
             # otherwise do nothing
         
         # save energy from this MCS:
         if t >= t0 and (t-t0) % nth == 0:
-            excess_tot[int((t-t0)/nth)+1] = excess_tot[int((t-t0)/nth)] - E_change
-            times.append(t)
+            E_tot[int((t-t0)/nth)+1] = E_tot[int((t-t0)/nth)] + E_change
+            times = np.append(times, t)
     
-    times = np.array(times)
     
-    return excess_tot, times
+    return E_tot, times
 
 # %%
 
@@ -91,23 +81,41 @@ def MC_DE(N, J, T, t0, tm, nth=1):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     # set up lattice and variables
-    N = 256
+    N = 128
     
     J = 1
     Tc = 2.2692*J
     T = 0.1*Tc
-    t0 = 1  # at least 1 (0th saved automatically anyway!)
-    tm = 200
-    nth = 2
+    t0 = 100  # at least 1 (0th saved automatically anyway!)
+    tm = 800
+    nth = 100
+    reps = 10
     
+    num = int(np.floor((tm-t0)/nth)) + 1
+    Energies = np.zeros((num+1))
+    
+    for r in range(reps):
+        Es, times = MC_DE(N, J, T, t0, tm, nth=nth)
+        Energies += Es
+        print("Done repeat " + str(r))
+    
+    Energies /= reps
+    excess = 2*J - Energies/(N**2)
+    
+    # plot it:
     fig = plt.figure(figsize=(10, 7))
     ax = fig.gca()
     ax.tick_params(labelsize=16)
     ax.set_xlabel(r"$t \ [MCS]$")
-    ax.set_ylabel(r"$\Delta E/J$")
+    ax.set_ylabel(r"$\frac{\Delta E}{J}$")
     
-    excess, times = MC_DE(N, J, T, t0, tm, nth=nth)
-    
-    # plot it:
     ax.plot(times, excess/J)
+    
+    fig1 = plt.figure(figsize=(10, 7))
+    ax1 = fig1.gca()
+    ax1.tick_params(labelsize=16)
+    ax1.set_xlabel(r"$t^{-1/2} \ [MCS]$")
+    ax1.set_ylabel(r"$\frac{\Delta E}{J}$")
+    
+    ax1.plot(times**(-0.5), excess/J)
     
