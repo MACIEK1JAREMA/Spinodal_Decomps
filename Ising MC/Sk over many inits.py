@@ -13,7 +13,8 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 1024
+N = 1024  # takes 30 mins with 10 reps, 1 hr with 20 reps
+#N = 2048  # takes 2 hrs with 10 reps, 4 hrs with 20 reps
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
@@ -22,6 +23,7 @@ tm = int(N*0.8)
 nth = int((tm-t0)/12)
 
 reps = 10  # number of runs over different initial conditions
+#reps = 20
 dk = 1
 
 # set up arrays and length values:
@@ -41,8 +43,6 @@ stop = timeit.default_timer()
 print('Time: ', stop - start)
 
 
-# %%
-
 # ANALYSIS
 
 # average over initial conditions and normalise w.r.t chosen t0
@@ -60,9 +60,6 @@ kvals = (2*np.pi/N)*np.arange(1, int(N/2), dk)
 k_vals = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
 k = np.sum(avgSk_norm*k_vals**(moment+1)*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk, axis=0)
 L = (2*np.pi/k)**(1/moment)
-
-#k = np.sum(avgSk_norm*k_vals*dk, axis=0)/np.sum(avgSk_norm*dk, axis=0)
-#L = (2*np.pi/k)**(1/moment)
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
 
@@ -85,13 +82,11 @@ ax.plot(t_vals, np.exp(c1)*t_vals**m1, '-.b', label=f'fit at gradient={np.round(
 
 # plot S(k) with circularly averaged k and averaged over initial conditions
 # rescaled for proposed universal scaling relation
-
 figUni = plt.figure(figsize=(10, 7))
 axUni = figUni.gca()
 axUni.tick_params(labelsize=22)
 axUni.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
 axUni.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
-
 
 for i in range(1, len(avgSk_norm[0, :])):
     time = str(int(nth*(i-1) + t0)) + " MCS"

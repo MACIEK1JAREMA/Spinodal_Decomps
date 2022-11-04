@@ -49,7 +49,7 @@ def MC_DE(N, J, T, t0, tm, nth=1):
     
     for i in range(N):
         for j in range(N):
-            E_init = J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
+            E_init = 0.5*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
     
     # perp arrays to save results:
     E_tot = np.zeros((num+1))
