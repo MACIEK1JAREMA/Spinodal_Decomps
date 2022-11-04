@@ -239,12 +239,12 @@ def annulus_avg(ft, N, dk):
     -- dk - int - k space step
     """
     
-    kvals = np.arange(1, int(N/2), dk)
+    kvals = (2*np.pi/N)*np.arange(1, int(N/2), dk)
     average = np.zeros(len(kvals))
     
     for j, k in enumerate(kvals):
         # prepare axes
-        axes = np.arange(-int(N/2), int(N/2), dk)
+        axes = (2*np.pi/N)*np.arange(-int(N/2), int(N/2), dk)
         kx, ky = np.meshgrid(axes, axes)
         
         # get square radius

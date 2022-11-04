@@ -13,7 +13,7 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 1014
+N = 1024
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
@@ -62,10 +62,20 @@ avgSk_norm = np.nan_to_num(avgSk_norm, 0)
 stop = timeit.default_timer()
 print('Time: ', stop - start)
 
+
+# %%
+
+# ANALYSIS
+
+moment = 1
+
 # find average k from it and get L
 k_vals = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
-k = 2*np.pi*np.sum(avgSk_norm*k_vals**2*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk, axis=0)
-L = 2*np.pi/k
+k = np.sum(avgSk_norm*k_vals**(moment+1)*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk, axis=0)
+L = (2*np.pi/k)**(1/moment)
+
+k = np.sum(avgSk_norm*k_vals*dk, axis=0)/np.sum(avgSk_norm*dk, axis=0)
+L = (2*np.pi/k)**(1/moment)
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
 
