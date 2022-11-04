@@ -20,6 +20,7 @@ moment = 1
 reps = 10  # number of runs over different initial conditions
 dk = 1
 n_nths = 12
+upper_t_cut = 0.64   # or use 0.8 as in some papers
 
 #Ns = 2**np.arange(5, 10, 1, dtype=np.int64)
 Ns = np.array([32, 64, 128], dtype=np.int64)
@@ -30,8 +31,8 @@ exp_errs = np.zeros(len(Ns))
 
 for j in range(len(Ns)):
     t0 = int(Ns[j]/10)
-    tm = int(Ns[j]*0.8)
-    nth = int((tm-t0)/12)
+    tm = int(Ns[j]*upper_t_cut)
+    nth = int((tm-t0)/n_nths)
     
     # set up arrays and length values:
     mcss = int(np.floor((tm-t0)/nth)) + 2
@@ -76,8 +77,8 @@ print('Time: ', stop - start)
 Ns = np.array([800, 1024], dtype=np.int64)
 for j in range(len(Ns)):
     t0 = int(Ns[j]/10)
-    tm = int(Ns[j]*0.8)
-    nth = int((tm-t0)/12)
+    tm = int(Ns[j]*upper_t_cut)
+    nth = int((tm-t0)/n_nths)
     
     # set up arrays and length values:
     mcss = int(np.floor((tm-t0)/nth)) + 2
