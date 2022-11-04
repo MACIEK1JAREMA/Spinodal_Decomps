@@ -84,4 +84,19 @@
   numpages = {0},
 }
 
+@article{Brown1998,
+  author = {Brown, G., Rikvold, P. A. and Grant, M.},
+  title = {Universality and scaling for the structure factor in dynamic order-disorder transitions},
+  publisher = {American Physical Society},
+  journal = {Phys. Rev. E},
+  month = {Nov},
+  year = {1998},
+  doi = {10.1103/PhysRevE.58.5501},
+  volume = {58},
+  issue = {5},
+  pages = {5501--5507},
+  numpages = {0},
+}
+
+
 
