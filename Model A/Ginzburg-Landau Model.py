@@ -17,7 +17,7 @@ def annulus_average(ft, N, k1, dk):
     rows = indices[:,0]
     columns = indices[:,1]
     
-    sf = ft * np.conj(ft) # Square magnitude
+    sf = ft * np.conj(ft) # Square magnitude of FT
 
     average = np.mean(sf[rows, columns]) # returns slope ~ 0.66
     # average = np.sum(k1*sf[rows, columns])/np.sum(sf[rows, columns]) # returns slope ~0
@@ -33,14 +33,16 @@ if __name__ == "__main__":
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
-    num_repeats = 1
+    num_repeats = 20
     
     # Variables and array for structure factor
     dk = 1
-    # k ranges from 1 to N/2
-    kvals = np.arange(1, int(grid_size/2), dk)
+    # k ranges from 2pi/N to pi
+    kvals = np.arange(1, int(grid_size/2)+1, dk)
     interval = 32
     sf_times = t_array[::interval]
+    # structure factor array as long as number of repeats, with enough
+    # space for each time step for each repeat
     sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
     
     for repeat in range(num_repeats):
@@ -65,12 +67,9 @@ if __name__ == "__main__":
             # Preparing structure factor array for each value of k
             sf[repeat][i] = np.zeros(len(kvals))
             
-            # Calculating structure factor
+            # Calculating structure factor for given repeat and time across k
             for j, k in enumerate(kvals):
                 sf[repeat][i][j] = annulus_average(ft, grid_size, k, dk)
-            
-            # Normalising structure factor
-            sf[repeat][i] = sf[repeat][i]/sf[repeat][0]
     
     # Averaging structure factor over each repeat and plotting
     averaged_sf = np.mean(sf, axis=0)
@@ -80,12 +79,23 @@ if __name__ == "__main__":
     ax_sf.set_xlabel("$|k|t^{\\frac{1}{2}}$", fontsize=16)
     ax_sf.set_ylabel("$\\frac{S(|k|)}{t}$", fontsize=16)
     
+    averaged_k = []
+    alt_length = []
+    
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
         
+        # Normalising structure factor after they were averaged over initial
+        # conditions earlier
         structure_factor = structure_factor/averaged_sf[0]
-        k = 2*np.pi*(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
         
+        # SF weighted average k value
+        # Might need to include 2pi/N in kvals here and remove it from above
+        k = (2*np.pi/grid_size)*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
+        averaged_k.append(k)
+        
+        # need to plot k^(1/z) against S^-(2/z)
         ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))
+        # ax_sf.plot(kvals*time**0.2904, structure_factor/(time**(2/0.2904)), label="$t$="+str(np.round(time,0)))
     ax_sf.legend()
         
     # Displays the final state
@@ -105,28 +115,28 @@ if __name__ == "__main__":
     plt.show()
     
 #%%
-# Finding gradient of SF(k=0) vs time
-
-# Plots currently change depending on what time, indicating that the axis scaling
-# isn't quite right
-
-from scipy.optimize import curve_fit
+from scipy.stats import linregress as linreg
 
 if __name__ == "__main__":
-    # Wrong size broadcasting
-    k = 2*np.pi*(averaged_sf*kvals**2*dk)/np.sum(averaged_sf*kvals*dk)
-    L = 2*np.pi/k
     
-    log_time = np.log(sf_times)
-    log_l = np.log(L)
+    length = 2*np.pi/np.array(averaged_k)
+    log_time = np.log(sf_times[1:])
+    log_length = np.log(length)
     
-    fig_log = plt.figure(figsize=(8,6))
-    ax_log = fig_log.gca()
-    ax_log.plot(log_time, log_l, "kx")
-    ax_log.set_xlabel("$\\log(t)$", fontsize=16)
-    ax_log.set_ylabel("log[S($k=0,t$)]", fontsize=16)
+    # gradient, intercept, R-value (how linear it is), error in int., error in grad.
+    m1, c1, rval1, _, std1 = linreg(log_time, log_length)
+    
+    fig_length, ax_length = plt.subplots(figsize=(8,6))
+    ax_length.set_xlabel("$\\log(t)$", fontsize=16)
+    ax_length.set_ylabel("$\\log(L=\\frac{2\\pi}{k})$", fontsize=16)
+    ax_length.plot(log_time, log_length, "rx")
+    ax_length.plot(log_time, m1*log_time + c1, "k--")
+    # Showing gradient error. Typically too small to see
+    # ax_length.plot(log_time, (m1+std1)*log_time + c1, "r")
+    # ax_length.plot(log_time, (m1-std1)*log_time + c1, "r")
     
     
+    print("Gradient was determined to be "+str(np.round(m1,3))+" ± "+str(np.round(std1, 3)))
 #%%
     # Calculating and plotting structure factor for various time steps
     fig_sf = plt.figure(figsize=(8,6))
