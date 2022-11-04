@@ -303,7 +303,7 @@ def Sk_MCrun_ani(N, Jx, Jy, T, dk, t0, tm, nth):
         av, kvals = annulus_avg(np.real(ft*np.conj(ft)), N, dk)
         average[:, i] = av
     
-    return average
+    return average, kvals
 
 
 def Sk_MCrun_frust(N, Jnn, Jnnn, T, dk, t0, tm, nth):
@@ -325,7 +325,7 @@ def Sk_MCrun_frust(N, Jnn, Jnnn, T, dk, t0, tm, nth):
         av, kvals = annulus_avg(np.real(ft*np.conj(ft)), N, dk)
         average[:, i] = av
     
-    return average
+    return average, kvals
 
 
 # %%

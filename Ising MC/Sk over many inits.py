@@ -13,13 +13,13 @@ import timeit
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 256
+N = 1024
 J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
-t0 = 20
-tm = 100
-nth = 40
+t0 = int(N/10)
+tm = int(N*0.8)
+nth = int((tm-t0)/12)
 
 reps = 10  # number of runs over different initial conditions
 dk = 1
@@ -109,28 +109,3 @@ for i in range(1, len(avgSk_norm[0, :])):
 #    time = str(int(nth*(i-1) + t0)) + " MCS"
 #    axSn.plot(kvals, avgSk_norm[:, i], label=r"$t=$"+time)
 #axSn.legend(fontsize=22)
-
-# %%
-
-figUni = plt.figure(figsize=(10, 7))
-axUni = figUni.gca()
-axUni.tick_params(labelsize=22)
-
-
-N = 128
-J = 1
-Tc = 2.2692*J
-T = 0.1*Tc
-t0 = 1
-tm = 250
-nth = 10
-
-
-configs = MC.MC(N, J, T, t0, tm, nth=nth)
-# Lattice spins FT
-ft = np.fft.ifftshift(configs[:, :, 20])
-ft = np.fft.fft2(ft)
-ft = np.fft.fftshift(ft)
-ftsq = np.real(ft*np.conj(ft))
-
-axUni.imshow(ftsq)

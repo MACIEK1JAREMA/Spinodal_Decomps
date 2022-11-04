@@ -4,7 +4,7 @@ import numpy as np
 from numba import jit
 
 
-#@jit(nopython=True)
+@jit(nopython=True)
 def MC_DE(N, J, T, t0, tm, nth=1):
     """
     Function to simulate Monte Carlo simulation of 2D Ising Model
@@ -45,12 +45,16 @@ def MC_DE(N, J, T, t0, tm, nth=1):
     nn_l = nn_t.T
     
     # find it's total energy to begin with:
-    E_init = 2*J*(np.sum( lat * (lat[nn_t, :] + lat[nn_b, :] + lat[:, nn_r] + lat[:, nn_l] )))
+    #E_init = J*(np.sum( lat * (lat[nn_t, :] + lat[nn_b, :] + lat[:, nn_r] + lat[:, nn_l] )))
+    
+    for i in range(N):
+        for j in range(N):
+            E_init = J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
     
     # perp arrays to save results:
     E_tot = np.zeros((num+1))
     E_tot[0] = E_init
-    times = np.array([0])  # times that end up being saved
+    times = np.zeros((num+1))  # times that end up being saved
     
     # look over all MCS times with N^2 attempts of flip on each run
     for t in range(1, tm+1):
@@ -70,7 +74,7 @@ def MC_DE(N, J, T, t0, tm, nth=1):
         # save energy from this MCS:
         if t >= t0 and (t-t0) % nth == 0:
             E_tot[int((t-t0)/nth)+1] = E_tot[int((t-t0)/nth)] + E_change
-            times = np.append(times, t)
+            times[int((t-t0)/nth)+1] = t
     
     
     return E_tot, times
@@ -81,18 +85,19 @@ def MC_DE(N, J, T, t0, tm, nth=1):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     # set up lattice and variables
-    N = 128
+    N = 256
     
     J = 1
     Tc = 2.2692*J
     T = 0.1*Tc
-    t0 = 100  # at least 1 (0th saved automatically anyway!)
-    tm = 800
-    nth = 100
+    n_nths = 12
     reps = 10
     
-    num = int(np.floor((tm-t0)/nth)) + 1
-    Energies = np.zeros((num+1))
+    t0 = int(N/10)
+    tm = int(N)
+    nth = int((tm-t0)/n_nths)
+    
+    Energies = np.zeros((int(np.floor((tm-t0)/nth))+2))
     
     for r in range(reps):
         Es, times = MC_DE(N, J, T, t0, tm, nth=nth)
@@ -105,17 +110,17 @@ if __name__ == "__main__":
     # plot it:
     fig = plt.figure(figsize=(10, 7))
     ax = fig.gca()
-    ax.tick_params(labelsize=16)
-    ax.set_xlabel(r"$t \ [MCS]$")
-    ax.set_ylabel(r"$\frac{\Delta E}{J}$")
+    ax.tick_params(labelsize=22)
+    ax.set_xlabel(r"$t \ [MCS]$", fontsize=22)
+    ax.set_ylabel(r"$\frac{\Delta E}{J}$", fontsize=22)
     
     ax.plot(times, excess/J)
     
     fig1 = plt.figure(figsize=(10, 7))
     ax1 = fig1.gca()
-    ax1.tick_params(labelsize=16)
-    ax1.set_xlabel(r"$t^{-1/2} \ [MCS]$")
-    ax1.set_ylabel(r"$\frac{\Delta E}{J}$")
+    ax1.tick_params(labelsize=22)
+    ax1.set_xlabel(r"$t^{-1/2} \ [MCS]$", fontsize=22)
+    ax1.set_ylabel(r"$\frac{\Delta E}{J}$", fontsize=22)
     
     ax1.plot(times**(-0.5), excess/J)
     
