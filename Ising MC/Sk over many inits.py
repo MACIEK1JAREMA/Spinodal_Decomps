@@ -19,7 +19,7 @@ J = 1
 Tc = 2.2692*J
 T = 0.1*Tc
 t0 = int(N/10)
-tm = int(N*0.8)
+tm = int(N*0.64)
 nth = int((tm-t0)/12)
 
 reps = 40  # number of runs over different initial conditions
@@ -62,10 +62,11 @@ k = np.sum(avgSk_norm*k_vals**(moment+1)*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk
 L = (2*np.pi/k)**(1/moment)
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
-
+# %%
 # plot it as a function of t on log log:
 fig = plt.figure(figsize=(10, 7))
 ax = fig.gca()
+ax.tick_params(labelsize=22)
 ax.set_xlabel(r'$t [MCS]$', fontsize=22)
 ax.set_ylabel(r'$L(t)$', fontsize=22)
 ax.set_yscale('log')

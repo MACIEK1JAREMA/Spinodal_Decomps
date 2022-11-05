@@ -49,7 +49,7 @@ def MC_DE(N, J, T, t0, tm, nth=1):
     
     for i in range(N):
         for j in range(N):
-            E_init = 0.5*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
+            E_init = 0.5*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i, j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
     
     # perp arrays to save results:
     E_tot = np.zeros((num+1))
@@ -57,23 +57,24 @@ def MC_DE(N, J, T, t0, tm, nth=1):
     times = np.zeros((num+1))  # times that end up being saved
     
     # look over all MCS times with N^2 attempts of flip on each run
+    E_change = 0
     for t in range(1, tm+1):
-        E_change = 0
         for n in range(N**2):
             # pick a random spin site:
             i = np.random.randint(N)
             j = np.random.randint(N)
             # calculate energy factor:
-            dE = 2*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i,j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
+            dE = 2*J*lat[i, j]*( lat[nn_t[i, j], j] + lat[nn_b[i, j], j] + lat[i, nn_r[i, j]] + lat[i, nn_l[i, j]] )
             r = np.exp(-dE/T)
             if r > z[0, (t-t0)*n + n]:
                 lat[i, j] *= -1
-                E_change -=  dE # update total energy
+                E_change += dE # update total energy
             # otherwise do nothing
         
         # save energy from this MCS:
         if t >= t0 and (t-t0) % nth == 0:
-            E_tot[int((t-t0)/nth)+1] = E_tot[int((t-t0)/nth)] + E_change
+            E_tot[int((t-t0)/nth)+1] = E_tot[int((t-t0)/nth)] - E_change
+            E_change = 0
             times[int((t-t0)/nth)+1] = t
     
     
@@ -90,12 +91,11 @@ if __name__ == "__main__":
     J = 1
     Tc = 2.2692*J
     T = 0.1*Tc
-    n_nths = 12
     reps = 10
     
-    t0 = int(N/10)
-    tm = int(N)
-    nth = int((tm-t0)/n_nths)
+    t0 = 2
+    tm = N
+    nth = 2
     
     Energies = np.zeros((int(np.floor((tm-t0)/nth))+2))
     
