@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from continuum_solvers import solver
+#%%
 
 def annulus_average(ft, N, k1, dk):
     half_grid_size = int(N/2)
@@ -17,32 +18,20 @@ def annulus_average(ft, N, k1, dk):
     rows = indices[:,0]
     columns = indices[:,1]
     
-    sf = ft * np.conj(ft) # Square magnitude of FT
+    sf = ft * np.conj(ft) # Square magnitude
 
     average = np.mean(sf[rows, columns]) # returns slope ~ 0.66
     # average = np.sum(k1*sf[rows, columns])/np.sum(sf[rows, columns]) # returns slope ~0
     return average
 
-if __name__ == "__main__":
-    # Set up lattice
-    grid_size = 128
-    grid_spacing = 1
-    
-    # Time array
-    tmax = 100
-    num_time_steps = 1024
-    t_array = np.linspace(0, tmax, num_time_steps)
-    
-    num_repeats = 20
-    
+def sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats):
+
     # Variables and array for structure factor
     dk = 1
-    # k ranges from 2pi/N to pi
-    kvals = np.arange(1, int(grid_size/2)+1, dk)
-    interval = 32
+    # k ranges from 1 to N/2
+    kvals = np.arange(1, int(grid_size/2), dk)
+    interval = 171
     sf_times = t_array[::interval]
-    # structure factor array as long as number of repeats, with enough
-    # space for each time step for each repeat
     sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
     
     for repeat in range(num_repeats):
@@ -67,38 +56,81 @@ if __name__ == "__main__":
             # Preparing structure factor array for each value of k
             sf[repeat][i] = np.zeros(len(kvals))
             
-            # Calculating structure factor for given repeat and time across k
+            # Calculating structure factor
             for j, k in enumerate(kvals):
                 sf[repeat][i][j] = annulus_average(ft, grid_size, k, dk)
     
     # Averaging structure factor over each repeat and plotting
     averaged_sf = np.mean(sf, axis=0)
-    fig_sf = plt.figure(figsize=(10,8))
+    return sf_times, averaged_sf, kvals
+
+#%%
+# Structure factor calculations
+
+if __name__ == "__main__":
+    # Set up lattice
+    grid_size = 512
+    grid_spacing = 1
+    
+    # Time array
+    tmax = 200
+    num_time_steps = 1024
+    t_array = np.linspace(0, tmax, num_time_steps)
+    
+    num_repeats = 10
+    dk = 1
+    
+    sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
+
+    fig_sf = plt.figure(figsize=(8,6))
     ax_sf = fig_sf.gca()
-    ax_sf.set_title("Structure Factor (averaged over "+str(num_repeats)+" repeats)", fontsize=20)
-    ax_sf.set_xlabel("$|k|t^{\\frac{1}{2}}$", fontsize=16)
-    ax_sf.set_ylabel("$\\frac{S(|k|)}{t}$", fontsize=16)
-    
-    averaged_k = []
-    alt_length = []
-    
+    ax_sf.tick_params(labelsize=22)
+    ax_sf.set_xlabel(r"$k$", fontsize=22)
+    ax_sf.set_ylabel(r"S($k$)$/$S($k$)$|_{t_{0}}$", fontsize=22)
+        
+    L = []
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
         
-        # Normalising structure factor after they were averaged over initial
-        # conditions earlier
         structure_factor = structure_factor/averaged_sf[0]
-        
-        # SF weighted average k value
-        # Might need to include 2pi/N in kvals here and remove it from above
-        k = (2*np.pi/grid_size)*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
-        averaged_k.append(k)
-        
-        # need to plot k^(1/z) against S^-(2/z)
-        ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))
-        # ax_sf.plot(kvals*time**0.2904, structure_factor/(time**(2/0.2904)), label="$t$="+str(np.round(time,0)))
-    ax_sf.legend()
-        
-    # Displays the final state
+        k = 2*np.pi*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
+        L.append(2*np.pi/k)
+        # ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))#
+        ax_sf.plot(kvals, structure_factor, label="$t$="+str(np.round(time,0)))
+    ax_sf.legend(fontsize=22)
+    
+    
+#%%
+# Finding gradient of SF(k=0) vs time
+
+if __name__ == "__main__":
+    # Wrong size broadcasting
+    
+    log_time = np.log(sf_times[1:])
+    log_l = np.log(np.array(L))
+    
+    fig_log = plt.figure(figsize=(8,6))
+    ax_log = fig_log.gca()
+    ax_log.plot(log_time, log_l, "kx")
+    ax_log.set_xlabel("$\\log(t)$", fontsize=16)
+    ax_log.set_ylabel("$\\langle k(t) \\rangle$", fontsize=16)
+    
+    
+#%%
+# Displays various states
+
+if __name__ == "__main__":
+    # Set up lattice
+    grid_size = 2
+    grid_spacing = 1
+    grid = np.random.rand(grid_size, grid_size)*2 -1
+    
+    # Time array
+    tmax = 200
+    num_time_steps = 1024
+    t_array = np.linspace(0, tmax, num_time_steps)
+    
+    phi = solver(grid, t_array, grid_size, grid_spacing, driving=True)
+    
     fig_phi = plt.figure(figsize=(8,6))
     ax_phi = fig_phi.gca()
     ax_phi.set_title("Landau-Ginzburg Equation Evolution\nN="+str(grid_size)+", $t$="+\
@@ -113,103 +145,82 @@ if __name__ == "__main__":
     cax.set_frame_on(False)
     fig_phi.colorbar(img_phi, orientation='vertical')
     plt.show()
+
+#%%
+# Producing snapshots for report
+if __name__ == "__main__":
+    phi_0 = phi[np.min(np.argwhere(t_array >=0))]
+    phi_10 = phi[np.min(np.argwhere(t_array >=10))]
+    phi_50 = phi[np.min(np.argwhere(t_array >=50))]
+    phi_200 = phi[np.min(np.argwhere(t_array >=200))]
+    
+    fig_snapshots, ax_snapshots = plt.subplots(1,4, figsize=(15,4))
+    fig_snapshots.subplots_adjust(right=0.942, left=0.092, top=0.885, bottom=0.117, hspace=0.301, wspace=0.071)
+    
+    for ax in ax_snapshots:
+        ax.tick_params(axis='y', which='both', bottom=False, top=False, labelbottom=False)
+        ax.tick_params(labelsize=22)
+    
+    ax_snapshots[0].imshow(phi_0, cmap="Greys")
+    ax_snapshots[0].set_title("$t=0$", fontsize=20)
+    ax_snapshots[0].set_ylabel("$pixel$", fontsize=22)
+    ax_snapshots[0].xaxis.set_major_locator(plt.MaxNLocator(4))
+    ax_snapshots[0].yaxis.set_major_locator(plt.MaxNLocator(4))
+    
+    ax_snapshots[1].imshow(phi_10, cmap="Greys", vmin=-1, vmax=1)
+    ax_snapshots[1].set_title("$t=10$", fontsize=20)
+    ax_snapshots[1].set_yticks([])
+    ax_snapshots[1].xaxis.set_major_locator(plt.MaxNLocator(4))
+    
+    ax_snapshots[2].imshow(phi_50, cmap="Greys", vmin=-1, vmax=1)
+    ax_snapshots[2].set_title("$t=50$", fontsize=20)
+    ax_snapshots[2].set_yticks([])
+    ax_snapshots[2].xaxis.set_major_locator(plt.MaxNLocator(4))
+    
+    ax_snapshots[3].imshow(phi_200, cmap="Greys", vmin=-1, vmax=1)
+    ax_snapshots[3].set_title("$t=200$", fontsize=20)
+    ax_snapshots[3].set_yticks([])
+    ax_snapshots[3].xaxis.set_major_locator(plt.MaxNLocator(4))
     
 #%%
-from scipy.stats import linregress as linreg
+# Time taken to run simulations VS lattice size
+import time
+if __name__ == "__main__":
+    time_to_run = np.zeros(9)
+    size_array = 2**np.arange(1, 10, 1)
+    
+    for i, grid_size in enumerate(size_array):
+        print("Running grid size = "+str(grid_size))
+        start = time.time()
+        # Set up lattice
+        grid_spacing = 1
+        grid = np.random.rand(grid_size, grid_size)*2 -1
+        
+        # Time array
+        tmax = 20
+        num_time_steps = 1024
+        t_array = np.linspace(0, tmax, num_time_steps)
+        
+        phi = solver(grid, t_array, grid_size, grid_spacing, driving=True)
+        time_to_run[i] = time.time() - start
+    
+    fig_time = plt.figure(figsize=(10,7))
+    ax_time = fig_time.gca()
+    ax_time.set_xlabel("$N$", fontsize=22)
+    ax_time.set_ylabel("$t [s]$", fontsize=22)
+    ax_time.plot(size_array, time_to_run)
+    
+    fig_squared = plt.figure(figsize=(10,7))
+    ax_squared = fig_squared.gca()
+    ax_squared.set_xlabel("$N^{2}$", fontsize=22)
+    ax_squared.set_ylabel("$t [s]$", fontsize=22)
+    ax_squared.plot(size_array**2, time_to_run)
+        
+
+#%%
+# Animating the time evolution
 
 if __name__ == "__main__":
-    
-    length = 2*np.pi/np.array(averaged_k)
-    log_time = np.log(sf_times[1:])
-    log_length = np.log(length)
-    
-    # gradient, intercept, R-value (how linear it is), error in int., error in grad.
-    m1, c1, rval1, _, std1 = linreg(log_time, log_length)
-    
-    fig_length, ax_length = plt.subplots(figsize=(8,6))
-    ax_length.set_xlabel("$\\log(t)$", fontsize=16)
-    ax_length.set_ylabel("$\\log(L=\\frac{2\\pi}{k})$", fontsize=16)
-    ax_length.plot(log_time, log_length, "rx")
-    ax_length.plot(log_time, m1*log_time + c1, "k--")
-    # Showing gradient error. Typically too small to see
-    # ax_length.plot(log_time, (m1+std1)*log_time + c1, "r")
-    # ax_length.plot(log_time, (m1-std1)*log_time + c1, "r")
-    
-    
-    print("Gradient was determined to be "+str(np.round(m1,3))+" ± "+str(np.round(std1, 3)))
-#%%
-    # Calculating and plotting structure factor for various time steps
-    fig_sf = plt.figure(figsize=(8,6))
-    ax_sf = fig_sf.gca()
-    ax_sf.set_xlabel("$k$", fontsize=16)
-    ax_sf.set_ylabel("SF($k$)", fontsize=16)
-    ax_sf.set_title("Structure Factor", fontsize=18)
-    
-    # num_curves = 20
-    # time_interval = int(np.round(num_time_steps/num_curves, 0))
-    # state_interval = int(np.round(len(phi)/num_curves, 0))
-    '''Can't quite work out how to do an integer number of curves, so picking 16'''
-    time_interval, state_interval = 64, 64
-    sf_times = t_array[::time_interval]
-    sf_states = phi[::state_interval]
-    dk = 1
-    kvals = np.arange(0, grid_size, dk)
-    sf = np.zeros(len(sf_times), dtype=object)
-    
-    for i, time_and_state in enumerate(zip(sf_times, sf_states)):
-        time = time_and_state[0]
-        state = time_and_state[1]
-        
-        # Fourier transform of the lattice
-        ft = np.fft.ifftshift(state)
-        ft = np.fft.fft2(ft)
-        ft = np.fft.fftshift(ft)
-        
-        # Set up structure factor array
-        sf[i] = np.zeros(len(ft))
-        
-        # Finding average for k over multiple radii
-        for j, k in enumerate(kvals):
-            sf[i][j] = annulus_average(ft, grid_size, k, dk)
-    
-    # Plotting structure factor for each time step
-    for structure_factor, time in zip(sf[1:], sf_times):
-        ax_sf.plot(kvals, structure_factor/sf[0], label="$t$="+str(np.round(time,1)))
-    ax_sf.legend(fontsize=12)
-        
-    '''
-    TO-DO
-    Need to make this average over a bunch of states now, either wrap the
-    above in a for loop or define it as a function
-    '''
-    
-    # Displaying the end state
-    end_state = phi[-1]
-    fig_phi = plt.figure(figsize=(8,6))
-    ax_phi = fig_phi.gca()
-    ax_phi.set_title("Landau-Ginzburg Equation Evolution\nN="+str(grid_size)+", $t$="+\
-                     str(tmax)+" seconds", fontsize=16)
-    
-    img_phi = ax_phi.imshow(end_state, cmap="Greys", vmin=-1, vmax=1)
-    
-    cax = fig_phi.add_axes([0.2, 0.1, 0.8, 0.8])
-    cax.get_xaxis().set_visible(False)
-    cax.get_yaxis().set_visible(False)
-    cax.patch.set_alpha(0)
-    cax.set_frame_on(False)
-    fig_phi.colorbar(img_phi, orientation='vertical')
-    
-    '''
-    Remarks:
-        1) We could do a fun animation of evolving the state in time and
-          plotting the structure factor curve at the same time on another plot.
-          Just need to do all the calculations and then make the animation after
-    '''
-    
-#%%
-
-if __name__ == "__main__":
-    # Animating the time evolution
     fig_ani, ax_ani = plt.subplots()
 
     ims = []
