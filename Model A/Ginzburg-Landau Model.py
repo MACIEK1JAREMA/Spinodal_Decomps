@@ -145,10 +145,9 @@ if __name__ == "__main__":
     cax.set_frame_on(False)
     fig_phi.colorbar(img_phi, orientation='vertical')
     plt.show()
-
-#%%
-# Producing snapshots for report
-if __name__ == "__main__":
+    
+    # Snapshots for report
+    
     phi_0 = phi[np.min(np.argwhere(t_array >=0))]
     phi_10 = phi[np.min(np.argwhere(t_array >=10))]
     phi_50 = phi[np.min(np.argwhere(t_array >=50))]
@@ -255,9 +254,20 @@ if __name__ == "__main__":
     ax_squared.plot(size_array**2, time_to_run)
 
 #%%
-# Animating the time evolution
+# Animating and saving the time evolution
 
 if __name__ == "__main__":
+    grid_size = 512
+    grid_spacing = 1
+    grid = np.random.rand(grid_size, grid_size)*2 -1
+    
+    # Time array
+    tmax = 20
+    num_time_steps = 1024
+    t_array = np.linspace(0, tmax, num_time_steps)
+    
+    phi = solver(grid, t_array, grid_size, grid_spacing, driving=True)
+    
     fig_ani, ax_ani = plt.subplots()
 
     ims = []
@@ -270,13 +280,6 @@ if __name__ == "__main__":
     ani = animation.ArtistAnimation(fig_ani, ims, interval=5, blit=True,
                                     repeat_delay=10)
     
-    file_name = str(grid_size)+"_grid_diffusion.gif"
-    writer = animation.PillowWriter(fps=15)
-    ani.save(file_name, writer=writer)
-    
-#%%
-
-if __name__ == "__main__":
     file_name = str(grid_size)+"_grid_diffusion.gif"
     writer = animation.PillowWriter(fps=15)
     ani.save(file_name, writer=writer)
