@@ -30,7 +30,7 @@ def sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats):
     dk = 1
     # k ranges from 1 to N/2
     kvals = np.arange(1, int(grid_size/2), dk)
-    interval = 171
+    interval = 64   
     sf_times = t_array[::interval]
     sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
     
@@ -99,11 +99,12 @@ if __name__ == "__main__":
     ax_sf.legend(fontsize=22)
     
     
-#%%
-# Finding gradient of SF(k=0) vs time
+# #%%
+# # Finding gradient of SF(k=0) vs time
 
-if __name__ == "__main__":
-    # Wrong size broadcasting
+# if __name__ == "__main__":
+    
+    from scipy.stats import linregress as linreg
     
     log_time = np.log(sf_times[1:])
     log_l = np.log(np.array(L))
@@ -114,7 +115,60 @@ if __name__ == "__main__":
     ax_log.set_xlabel("$\\log(t)$", fontsize=16)
     ax_log.set_ylabel("$\\langle k(t) \\rangle$", fontsize=16)
     
+    m1, c1, rval1, _, std1 = linreg(log_time, log_l)
     
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.gca()
+    # ax.tick_params(labelsize=22)
+    ax.set_xlabel(r'$t [s]$', fontsize=22)
+    ax.set_ylabel(r'$L(t)$', fontsize=22)
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+    ax.tick_params(labelsize=22)
+    ax.plot(sf_times[1:], np.array(L))
+    
+    print("Gradient (1/z) is "+str(m1)+" ± "+str(std1))
+#%%
+# Z as a function of N
+import time
+from scipy.stats import linregress as linreg
+
+if __name__ == "__main__":
+    size_array = 2**np.arange(1, 10, 1)
+    zlist = np.zeros(len(size_array))
+    zerr = np.zeros(len(size_array))
+    
+    grid_spacing = 1
+    
+    # Time array
+    tmax = 200
+    num_time_steps = 1024
+    t_array = np.linspace(0, tmax, num_time_steps)
+    
+    num_repeats = 10
+    dk = 1
+    
+    for i, grid_size in enumerate(size_array):
+        print("Running grid size = "+str(grid_size))
+        sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
+    
+        L = []
+        for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
+            k = 2*np.pi*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
+            L.append(2*np.pi/k)
+    
+        log_time = np.log(sf_times[1:])
+        log_l = np.log(np.array(L))
+    
+        m1, c1, rval1, _, std1 = linreg(log_time, log_l)
+    
+        zlist[i] = m1
+        zerr[i] = std1
+    
+    fig = plt.figure(figsize=(10,7))
+    ax = fig.gca()
+    ax.plot(size_array, zlist)
+
 #%%
 # Displays various states
 
