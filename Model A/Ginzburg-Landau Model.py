@@ -216,6 +216,43 @@ if __name__ == "__main__":
     ax_squared.set_ylabel("$t [s]$", fontsize=22)
     ax_squared.plot(size_array**2, time_to_run)
         
+#%%
+# Time taken to calculate structure factor and run the simulation
+import time
+if __name__ == "__main__":
+    # Set up lattice
+    grid_size = 512
+    grid_spacing = 1
+    
+    # Time array
+    tmax = 100
+    num_time_steps = 1024
+    t_array = np.linspace(0, tmax, num_time_steps)
+    
+    num_repeats = 1
+    dk = 1
+    time_to_run = np.zeros(9)
+    size_array = 2**np.arange(1, 10, 1)
+    
+    for i, grid_size in enumerate(size_array):
+        print("Running grid size = "+str(grid_size))
+        start = time.time()
+        sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
+        time_to_run[i] = time.time() - start
+    
+    fig_time = plt.figure(figsize=(10,7))
+    ax_time = fig_time.gca()
+    ax_time.tick_params(labelsize=22)
+    ax_time.set_xlabel("$N$", fontsize=22)
+    ax_time.set_ylabel("$t [s]$", fontsize=22)
+    ax_time.plot(size_array, time_to_run)
+    
+    fig_squared = plt.figure(figsize=(10,7))
+    ax_squared = fig_squared.gca()
+    ax_squared.tick_params(labelsize=22)
+    ax_squared.set_xlabel("$N^{2}$", fontsize=22)
+    ax_squared.set_ylabel("$t [s]$", fontsize=22)
+    ax_squared.plot(size_array**2, time_to_run)
 
 #%%
 # Animating the time evolution
