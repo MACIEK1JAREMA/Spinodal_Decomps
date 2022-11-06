@@ -86,14 +86,14 @@ def MC_DE(N, J, T, t0, tm, nth=1):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     # set up lattice and variables
-    N = 256
+    N = 1024
     
     J = 1
     Tc = 2.2692*J
     T = 0.1*Tc
-    reps = 10
+    reps = 20
     
-    t0 = 2
+    t0 = 1
     tm = N
     nth = 2
     

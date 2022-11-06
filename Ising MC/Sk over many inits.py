@@ -22,7 +22,7 @@ t0 = int(N/10)
 tm = int(N*0.64)
 nth = int((tm-t0)/12)
 
-reps = 40  # number of runs over different initial conditions
+reps = 60  # number of runs over different initial conditions
 #reps = 20
 dk = 1
 
