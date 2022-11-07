@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker as mtick
 from scipy.stats import linregress as linreg
 import timeit
+import pandas as pd
 
 # %%
 
@@ -20,7 +21,7 @@ Tc = 2.2692*J
 T = 0.1*Tc
 t0 = int(N/10)
 tm = int(N*0.64)
-nth = int((tm-t0)/12)
+nth = int((tm-t0)/15)
 
 reps = 60  # number of runs over different initial conditions
 #reps = 20
@@ -47,6 +48,9 @@ print('Time: ', stop - start)
 
 # average over initial conditions and normalise w.r.t chosen t0
 avgSk = np.sum(average, axis=2)/reps
+
+# FROM here just for visual chekcs
+
 avgSk_norm = avgSk / avgSk[:, 0][:, None]
 #avgSk_norm = np.nan_to_num(avgSk_norm, 0)
 
@@ -57,12 +61,24 @@ moment = 1
 kvals = (2*np.pi/N)*np.arange(1, int(N/2), dk)
 
 # find average k from it and get L
-k_vals = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
-k = np.sum(avgSk_norm*k_vals**(moment+1)*dk, axis=0)/np.sum(avgSk_norm*k_vals*dk, axis=0)
+k_vals_arr = np.tile(kvals, (len(avgSk_norm[0, :]), 1)).T
+k = np.sum(avgSk_norm*k_vals_arr**(moment+1)*dk, axis=0)/np.sum(avgSk_norm*k_vals_arr*dk, axis=0)
 L = (2*np.pi/k)**(1/moment)
 
 t_vals = nth*(np.arange(1, len(avgSk_norm[0, :]), 1) - 1) + t0
-# %%
+
+# plot resulting S(k) at each t step
+figSn = plt.figure(figsize=(8, 6))
+axSn = figSn.gca()
+axSn.tick_params(labelsize=22)
+axSn.set_xlabel(r"$k$", fontsize=22)
+axSn.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
+
+for i in range(1, len(avgSk_norm[0, :])):
+    time = str(int(nth*(i-1) + t0)) + " MCS"
+    axSn.plot(kvals, avgSk_norm[:, i], label=r"$t=$"+time)
+axSn.legend(fontsize=22)
+
 # plot it as a function of t on log log:
 fig = plt.figure(figsize=(10, 7))
 ax = fig.gca()
@@ -94,14 +110,16 @@ for i in range(1, len(avgSk_norm[0, :])):
     axUni.plot(kvals*t_vals[i-1]**m1, avgSk_norm[:, i]/t_vals[i-1]**(2*m1), label=r"$t=$"+time)
 
 
-## plot resulting S(k) at each t step
-#figSn = plt.figure(figsize=(8, 6))
-#axSn = figSn.gca()
-#axSn.tick_params(labelsize=22)
-#axSn.set_xlabel(r"$k$", fontsize=22)
-#axSn.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
-#
-#for i in range(1, len(avgSk_norm[0, :])):
-#    time = str(int(nth*(i-1) + t0)) + " MCS"
-#    axSn.plot(kvals, avgSk_norm[:, i], label=r"$t=$"+time)
-#axSn.legend(fontsize=22)
+# %%
+
+# Saving data
+Skdf = pd.DataFrame(avgSk)
+Skdf.to_excel('Data Ising\Sk_avg_over_reps.xlsx', index=True)
+
+kvalsdf = pd.DataFrame(kvals)
+kvalsdf.to_excel('Data Ising\Sk_avg_over_reps_k_vals.xlsx', index=True)
+
+t_valsdf = pd.DataFrame(t_vals)
+t_valsdf.to_excel('Data Ising\Sk_avg_over_reps_t_vals.xlsx', index=True)
+
+# Will need to copy over to combined data Data/MC
