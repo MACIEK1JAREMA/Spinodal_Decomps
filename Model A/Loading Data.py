@@ -30,3 +30,13 @@ time_steps = np.loadtxt("data//model A time steps.txt")
 for sf in averaged_sf[1:]:
     normalised_sf = sf/averaged_sf[0]
     plt.plot(kvals, normalised_sf)
+    
+#%%
+# loading data for 1/z VS N
+# called "zlist" but it's actually the gradient
+# same for zerr, it's gradient errors
+# N is the list of system sizes (2 to 512 inclusive)
+
+zlist = np.loadtxt("data//model A 1/z values.txt")
+zerr = np.loadtxt("data//model A 1/z error bars.txt")
+N = np.loadtxt("data//model A 1/z system sizes.txt")

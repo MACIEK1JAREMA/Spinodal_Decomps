@@ -18,10 +18,9 @@ def annulus_average(ft, N, k1, dk):
     rows = indices[:,0]
     columns = indices[:,1]
     
-    sf = ft * np.conj(ft) # Square magnitude
+    sf = np.real(ft*np.conj(ft)) # Square magnitude
 
-    average = np.mean(sf[rows, columns]) # returns slope ~ 0.66
-    # average = np.sum(k1*sf[rows, columns])/np.sum(sf[rows, columns]) # returns slope ~0
+    average = np.mean(abs(sf[rows, columns])) 
     return average
 
 def sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats):
@@ -30,7 +29,7 @@ def sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats):
     dk = 1
     # k ranges from 1 to N/2
     kvals = np.arange(1, int(grid_size/2), dk)
-    interval = 85 # grabs 12 data points for L-t plot
+    interval = 64 # grabs 16 data points for L-t plot
     sf_times = t_array[::interval]
     sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
     
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
-    num_repeats = 10
+    num_repeats = 1
     dk = 1
     
     sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
@@ -93,25 +92,25 @@ if __name__ == "__main__":
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
         
         structure_factor = structure_factor/averaged_sf[0]
-        k = 2*np.pi*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
+        k = np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
         L.append(2*np.pi/k)
         # ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))#
         ax_sf.plot(kvals, structure_factor, label="$t$="+str(np.round(time,0)))
     
     # Saving data
     for i, sf in enumerate(averaged_sf):
-        name = "model A average unnormalised sf #"+str(i)+" over 10 inits.txt)"
+        name = "data//model A average unnormalised sf #"+str(i)+" over 10 inits.txt"
         np.savetxt(name, sf)
-    np.savetxt("model A time steps.txt", sf_times)
-    np.savetxt("model A kvals.txt", kvals)
-    np.savetxt("model A length scale.txt", np.array(L))
+    np.savetxt("data//model A time steps.txt", sf_times)
+    np.savetxt("data//model A kvals.txt", kvals)
+    np.savetxt("data//model A length scale.txt", np.array(L))
     
     ax_sf.legend(fontsize=22)
     
     from scipy.stats import linregress as linreg
-    
-    log_time = np.log(sf_times[1:])
-    log_l = np.log(np.array(L))
+    length = int(len(sf_times) * 0.8)
+    log_time = np.log(sf_times[1:length+2])
+    log_l = np.log(np.array(L[:length+1]))
     
     fig_log = plt.figure(figsize=(8,6))
     ax_log = fig_log.gca()
@@ -130,6 +129,8 @@ if __name__ == "__main__":
     ax.set_xscale('log')
     ax.tick_params(labelsize=22)
     ax.plot(sf_times[1:], np.array(L))
+    
+    plt.show()
     
     print("Gradient (1/z) is "+str(m1)+" ± "+str(std1))
 #%%
@@ -168,6 +169,10 @@ if __name__ == "__main__":
     
         zlist[i] = m1
         zerr[i] = std1
+    
+    np.savetxt("model A 1/z values.txt", zlist)
+    np.savetxt("model A 1/z value error bars.txt", zerr)
+    np.savetxt("model A 1/z system sizes.txt", size_array)
     
     fig = plt.figure(figsize=(10,7))
     ax = fig.gca()
