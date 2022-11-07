@@ -89,6 +89,7 @@ if __name__ == "__main__":
     ax_sf.set_ylabel(r"S($k$)$/$S($k$)$|_{t_{0}}$", fontsize=22)
         
     L = []
+    kvals = kvals * 2*np.pi/grid_size
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
         
         structure_factor = structure_factor/averaged_sf[0]
@@ -174,7 +175,7 @@ if __name__ == "__main__":
 
 if __name__ == "__main__":
     # Set up lattice
-    grid_size = 2
+    grid_size = 512
     grid_spacing = 1
     grid = np.random.rand(grid_size, grid_size)*2 -1
     
@@ -203,8 +204,8 @@ if __name__ == "__main__":
     # Snapshots for report
     
     phi_0 = phi[np.min(np.argwhere(t_array >=0))]
-    phi_10 = phi[np.min(np.argwhere(t_array >=10))]
-    phi_50 = phi[np.min(np.argwhere(t_array >=50))]
+    phi_10 = phi[np.min(np.argwhere(t_array >=2))]
+    phi_50 = phi[np.min(np.argwhere(t_array >=40))]
     phi_200 = phi[np.min(np.argwhere(t_array >=200))]
     
     fig_snapshots, ax_snapshots = plt.subplots(1,4, figsize=(15,4))
@@ -221,12 +222,12 @@ if __name__ == "__main__":
     ax_snapshots[0].yaxis.set_major_locator(plt.MaxNLocator(4))
     
     ax_snapshots[1].imshow(phi_10, cmap="Greys", vmin=-1, vmax=1)
-    ax_snapshots[1].set_title("$t=10$", fontsize=20)
+    ax_snapshots[1].set_title("$t=2$", fontsize=20)
     ax_snapshots[1].set_yticks([])
     ax_snapshots[1].xaxis.set_major_locator(plt.MaxNLocator(4))
     
     ax_snapshots[2].imshow(phi_50, cmap="Greys", vmin=-1, vmax=1)
-    ax_snapshots[2].set_title("$t=50$", fontsize=20)
+    ax_snapshots[2].set_title("$t=40$", fontsize=20)
     ax_snapshots[2].set_yticks([])
     ax_snapshots[2].xaxis.set_major_locator(plt.MaxNLocator(4))
     
