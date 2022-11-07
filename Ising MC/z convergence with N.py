@@ -101,7 +101,7 @@ T = 0.1*Tc
 
 moment = 1
 
-reps = 1  # number of runs over different initial conditions
+reps = 20  # number of runs over different initial conditions
 dk = 1
 n_nths = 12
 upper_t_cut = 0.64   # or use 0.8 as in some papers
