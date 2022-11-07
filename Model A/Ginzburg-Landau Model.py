@@ -30,7 +30,7 @@ def sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats):
     dk = 1
     # k ranges from 1 to N/2
     kvals = np.arange(1, int(grid_size/2), dk)
-    interval = 64   
+    interval = 85 # grabs 12 data points for L-t plot
     sf_times = t_array[::interval]
     sf = np.zeros((num_repeats, len(sf_times)), dtype=object)
     
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     
     sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
 
-    fig_sf = plt.figure(figsize=(8,6))
+    fig_sf = plt.figure(figsize=(10,7))
     ax_sf = fig_sf.gca()
     ax_sf.tick_params(labelsize=22)
     ax_sf.set_xlabel(r"$k$", fontsize=22)
@@ -97,13 +97,16 @@ if __name__ == "__main__":
         L.append(2*np.pi/k)
         # ax_sf.plot(kvals*time**0.5, structure_factor/time, label="$t$="+str(np.round(time,0)))#
         ax_sf.plot(kvals, structure_factor, label="$t$="+str(np.round(time,0)))
+    
+    # Saving data
+    for i, sf in enumerate(averaged_sf):
+        name = "model A average unnormalised sf #"+str(i)+" over 10 inits.txt)"
+        np.savetxt(name, sf)
+    np.savetxt("model A time steps.txt", sf_times)
+    np.savetxt("model A kvals.txt", kvals)
+    np.savetxt("model A length scale.txt", np.array(L))
+    
     ax_sf.legend(fontsize=22)
-    
-    
-# #%%
-# # Finding gradient of SF(k=0) vs time
-
-# if __name__ == "__main__":
     
     from scipy.stats import linregress as linreg
     
