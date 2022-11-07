@@ -91,6 +91,8 @@ if __name__ == "__main__":
     kvals = kvals * 2*np.pi/grid_size
     for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
         
+        # calculating average k here
+        
         structure_factor = structure_factor/averaged_sf[0]
         k = np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
         L.append(2*np.pi/k)
