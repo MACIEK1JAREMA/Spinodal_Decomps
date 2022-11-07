@@ -77,15 +77,14 @@ tarray = np.zeros((upto_power-2))
 n = 0
 for N in N_vals:
     
-    kvals = np.arange(0, N, dk)
     mcss = int(np.floor((tm-t0)/nth)) + 2
-    k_num = len(np.arange(0, N, dk))
+    k_num = len(np.arange(1, int(N/2), dk))
     
     st = time.time()  # start time
     
     average = np.zeros((k_num, mcss, reps))
     for i in range(reps):
-        average[:, :, i], kmax = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
+        average[:, :, i], kvals = MC.Sk_MCrun(N, J, T, dk, t0, tm, nth=nth)
     
     # average over initial conditions and normalise w.r.t chosen t0
     avgSk = np.sum(average, axis=2)/reps
