@@ -14,7 +14,7 @@ import pandas as pd
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 128  # takes 30 mins with 10 reps, 1 hr with 20 reps
+N = 1024  # takes 30 mins with 10 reps, 1 hr with 20 reps
 #N = 2048  # takes 2 hrs with 10 reps, 4 hrs with 20 reps
 J = 1
 Tc = 2.2692*J
@@ -48,6 +48,9 @@ print('Time: ', stop - start)
 
 # average over initial conditions and normalise w.r.t chosen t0
 avgSk = np.sum(average, axis=2)/reps
+
+# FROM here just for visual chekcs
+
 avgSk_norm = avgSk / avgSk[:, 0][:, None]
 #avgSk_norm = np.nan_to_num(avgSk_norm, 0)
 
@@ -106,7 +109,9 @@ for i in range(1, len(avgSk_norm[0, :])):
     time = str(int(nth*(i-1) + t0)) + " MCS"
     axUni.plot(kvals*t_vals[i-1]**m1, avgSk_norm[:, i]/t_vals[i-1]**(2*m1), label=r"$t=$"+time)
 
+
 # %%
+
 # Saving data
 Skdf = pd.DataFrame(avgSk)
 Skdf.to_excel('Data Ising\Sk_avg_over_reps.xlsx', index=True)
