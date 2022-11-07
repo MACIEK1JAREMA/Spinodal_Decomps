@@ -21,13 +21,13 @@ T = 0.1*Tc
 
 moment = 1
 
-reps = 3  # number of runs over different initial conditions
+reps = 20  # number of runs over different initial conditions
 dk = 1
 n_nths = 12
 upper_t_cut = 0.64   # or use 0.8 as in some papers
 
 #Ns = 2**np.arange(5, 10, 1, dtype=np.int64)
-Ns = np.array([64, 128, 256, 370, 512], dtype=np.int64)
+Ns = np.array([64, 128, 256, 370, 512, 750, 1024], dtype=np.int64)
 #Ns = np.append(Ns, np.arange(200, 700, 50, dtype=np.int64))
 
 exponents = np.zeros((len(Ns), reps))
