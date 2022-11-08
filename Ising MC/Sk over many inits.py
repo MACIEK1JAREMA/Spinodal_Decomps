@@ -14,7 +14,7 @@ import pandas as pd
 start = timeit.default_timer()
 
 # set up lattice and variables
-N = 1024  # takes 30 mins with 10 reps, 1 hr with 20 reps
+N = 256  # takes 30 mins with 10 reps, 1 hr with 20 reps
 #N = 2048  # takes 2 hrs with 10 reps, 4 hrs with 20 reps
 J = 1
 Tc = 2.2692*J
@@ -23,7 +23,7 @@ t0 = int(N/10)
 tm = int(N*0.64)
 nth = int((tm-t0)/15)
 
-reps = 60  # number of runs over different initial conditions
+reps = 2  # number of runs over different initial conditions
 #reps = 20
 dk = 1
 
