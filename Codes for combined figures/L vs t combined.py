@@ -96,8 +96,8 @@ print('\n')
 ax.plot(np.log(t_vals1), c1 + m1* np.log(t_vals1), '-.g', label=r'MC gradient={:.4f} $\pm$ {:.4f}'.format(np.round(m1, 4), np.round(std1, 4)))
 
 m2, c2, rval2, _, std2 = linreg(np.log(t_vals2[1:]), np.log(L2[1:]))
-print(f'GLT for 1/z = {np.round(m1, 4)} and error +- {np.round(std1, 4)}')
-print(f'with R-value of {np.round(rval1, 4)}')
+print(f'GLT for 1/z = {np.round(m2, 4)} and error +- {np.round(std2, 4)}')
+print(f'with R-value of {np.round(rval2, 4)}')
 print('\n')
 ax.plot(np.log(t_vals2[1:]), c2 + m2* np.log(t_vals2[1:]), '-.b', label=r'GLT gradient={:.4f} $\pm$ {:.4f}'.format(np.round(m2, 4), np.round(std2, 4)))
 
