@@ -20,7 +20,7 @@ kvals1 = pd.read_excel("Data\MC\Sk_avg_over_reps_k_vals.xlsx", index_col=0)
 kvals1 = kvals1.to_numpy()[:, 0]
 
 # Read in GLT data
-num_time_steps = 13
+num_time_steps = 16
 kvals2 = np.loadtxt("Data\GLT\model A kvals.txt")
 t_vals2 = np.loadtxt("Data\GLT\model A time steps.txt")
 averaged_sf2 = np.zeros((num_time_steps, len(kvals2)))
@@ -80,26 +80,26 @@ for i in plotted_ts2:   # Update once data is produced
 fig = plt.figure(figsize=(10, 7))
 ax = fig.gca()
 ax.tick_params(labelsize=22)
-ax.set_xlabel(r'$t [MCS, s]$', fontsize=22)
-ax.set_ylabel(r'$L(t)$', fontsize=22)
-ax.set_yscale('log')
-ax.set_xscale('log')
+ax.set_xlabel(r'$log(t)$', fontsize=22)
+ax.set_ylabel(r'$log(L(t))$', fontsize=22)
+# ax.set_yscale('log')
+# ax.set_xscale('log')
 ax.tick_params(labelsize=22)
-ax.plot(t_vals1, L1[1:], 'g^', ms=10)  # omit initial condition as at t=0
-ax.plot(t_vals2[1:], L2[1:], 'bo', ms=10)  # omit initial condition as at t=0
+ax.plot(np.log(t_vals1), np.log(L1[1:]), 'g^', ms=10)  # omit initial condition as at t=0
+ax.plot(np.log(t_vals2[1:]), np.log(L2[1:]), 'bo', ms=10)  # omit initial condition as at t=0
 
 # check the gradient of the linear ones
 m1, c1, rval1, _, std1 = linreg(np.log(t_vals1), np.log(L1[1:]))
 print(f'MC for 1/z = {np.round(m1, 4)} and error +- {np.round(std1, 4)}')
 print(f'with R-value of {np.round(rval1, 4)}')
 print('\n')
-ax.plot(t_vals1, np.exp(c1)*t_vals1**m1, '-.g', label=f'MC gradient={np.round(m1, 4)}')
+ax.plot(np.log(t_vals1), c1 + m1* np.log(t_vals1), '-.g', label=r'MC gradient={:.4f} $\pm$ {:.4f}'.format(np.round(m1, 4), np.round(std1, 4)))
 
 m2, c2, rval2, _, std2 = linreg(np.log(t_vals2[1:]), np.log(L2[1:]))
 print(f'GLT for 1/z = {np.round(m1, 4)} and error +- {np.round(std1, 4)}')
 print(f'with R-value of {np.round(rval1, 4)}')
 print('\n')
-ax.plot(t_vals2[1:], np.exp(c2)*t_vals2[1:]**m2, '-.b', label=f'GLT gradient={np.round(m2, 4)}')
+ax.plot(np.log(t_vals2[1:]), c2 + m2* np.log(t_vals2[1:]), '-.b', label=r'GLT gradient={:.4f} $\pm$ {:.4f}'.format(np.round(m2, 4), np.round(std2, 4)))
 
 
 # plot S(k) rescaled for proposed universal scaling relation
@@ -124,8 +124,8 @@ axUni2.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
 
 for i in plotted_ts2:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
-    time2 = str(int(t_vals2[i-1]))
-    axUni2.plot(kvals2*t_vals2[i-1]**m2, avgSk_norm2[:, i]/t_vals2[i-1]**(2*m2), label=r"$t=$"+time2)
+    time2 = str(int(t_vals2[i]))
+    axUni2.plot(kvals2*t_vals2[i]**m2, avgSk_norm2[:, i]/t_vals2[i]**(2*m2), label=r"$t=$"+time2)
 
 
 axSn1.legend(fontsize=22)
