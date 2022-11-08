@@ -64,7 +64,7 @@ stop = timeit.default_timer()
 print('Time: ', stop - start)
 
 exps = np.mean(exponents, axis=1)
-exp_errs = np.std(exponents, axis=1)
+exp_errs = np.std(exponents, axis=1)/np.sqrt(reps)
 
 
 # plot it as a function of t
@@ -74,6 +74,7 @@ ax.tick_params(labelsize=22)
 ax.set_xlabel(r'$N$', fontsize=22)
 ax.set_ylabel(r'$1/z$', fontsize=22)
 ax.errorbar(Ns, exps, yerr=exp_errs, capsize=2)
+
 
 # Saving data
 Nsdf = pd.DataFrame(Ns)
