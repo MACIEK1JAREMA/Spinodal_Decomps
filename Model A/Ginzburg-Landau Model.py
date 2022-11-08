@@ -156,25 +156,32 @@ if __name__ == "__main__":
     dk = 1
     
     for i, grid_size in enumerate(size_array):
-        print("Running grid size = "+str(grid_size))
-        sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
+        gradient = []
+        gradient_err = []
+        for n in range(num_repeats):
+            print("Running grid size = "+str(grid_size)+", repeat "+str(n))
+            sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, 1)
+        
+            L = []
+            for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
+                k = 2*np.pi*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
+                L.append(2*np.pi/k)
+        
+            log_time = np.log(sf_times[1:])
+            log_l = np.log(np.array(L))
+            
+            m1, c1, rval1, _, std1 = linreg(log_time, log_l)
+                
+            gradient.append(m1)
+            gradient_err.append(std1)
+
+        # mean of 1/z values and standard error on mean            
+        zlist[i] = np.mean(np.array(gradient))
+        zerr[i] = np.std(np.array(gradient))/np.sqrt(num_repeats)
     
-        L = []
-        for time, structure_factor in zip(sf_times[1:], averaged_sf[1:]):
-            k = 2*np.pi*np.sum(structure_factor*kvals**2*dk)/np.sum(structure_factor*kvals*dk)
-            L.append(2*np.pi/k)
-    
-        log_time = np.log(sf_times[1:])
-        log_l = np.log(np.array(L))
-    
-        m1, c1, rval1, _, std1 = linreg(log_time, log_l)
-    
-        zlist[i] = m1
-        zerr[i] = std1
-    
-    np.savetxt("model A 1/z values.txt", zlist)
-    np.savetxt("model A 1/z value error bars.txt", zerr)
-    np.savetxt("model A 1/z system sizes.txt", size_array)
+    np.savetxt("data//model A 1.z values.txt", zlist)
+    np.savetxt("data//model A 1.z value error bars.txt", zerr)
+    np.savetxt("data//model A 1.z system sizes.txt", size_array)
     
     fig = plt.figure(figsize=(10,7))
     ax = fig.gca()
