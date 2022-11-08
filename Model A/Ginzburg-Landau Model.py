@@ -68,7 +68,7 @@ def sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats):
 
 if __name__ == "__main__":
     # Set up lattice
-    grid_size = 512
+    grid_size = 1024
     grid_spacing = 1
     
     # Time array
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     num_time_steps = 1024
     t_array = np.linspace(0, tmax, num_time_steps)
     
-    num_repeats = 1
+    num_repeats = 10    
     dk = 1
     
     sf_times, averaged_sf, kvals = sf_calculator(grid_size, grid_spacing, dk, t_array, num_repeats)
