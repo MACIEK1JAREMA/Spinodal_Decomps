@@ -23,8 +23,7 @@ t0 = int(N/10)
 tm = int(N*0.64)
 nth = int((tm-t0)/15)
 
-reps = 2  # number of runs over different initial conditions
-#reps = 20
+reps = 60  # number of runs over different initial conditions
 dk = 1
 
 # set up arrays and length values:

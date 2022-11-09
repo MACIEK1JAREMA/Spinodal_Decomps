@@ -56,7 +56,7 @@ axSn1 = figSn1.gca()
 axSn1.tick_params(labelsize=22)
 axSn1.set_xlabel(r"$k$", fontsize=22)
 axSn1.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
-axSn1.set_xlim(0, np.pi/4)
+axSn1.set_xlim(0, np.pi/12)
 plotted_ts1 = [1, 5, 10, 15]   # Update once data is produced
 for i in plotted_ts1:   # Update once data is produced
     #time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -70,7 +70,7 @@ axSn2 = figSn2.gca()
 axSn2.tick_params(labelsize=22)
 axSn2.set_xlabel(r"$k$", fontsize=22)
 axSn2.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
-axSn2.set_xlim(0, np.pi/4)
+axSn2.set_xlim(0, np.pi/12)
 plotted_ts2 = [1, 5, 10, 15]   # Update once data is produced
 for i in plotted_ts2:   # Update once data is produced
     #time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -110,7 +110,7 @@ axUni1 = figUni1.gca()
 axUni1.tick_params(labelsize=22)
 axUni1.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
 axUni1.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
-axUni1.set_xlim(0, (np.pi/4)*t_vals1[-1]**m1)
+axUni1.set_xlim(0, (np.pi/12)*t_vals1[-1]**m1)
 
 for i in plotted_ts1:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -123,7 +123,7 @@ axUni2 = figUni2.gca()
 axUni2.tick_params(labelsize=22)
 axUni2.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
 axUni2.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
-axUni2.set_xlim(0, (np.pi/4)*t_vals2[-1]**m2)
+axUni2.set_xlim(0, (np.pi/12)*t_vals2[-1]**m2)
 for i in plotted_ts2:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
     time2 = str(int(t_vals2[i]))
@@ -139,7 +139,7 @@ axUni05a = figUni05a.gca()
 axUni05a.tick_params(labelsize=22)
 axUni05a.set_xlabel(r"$kt^{\frac{1}{2}}$", fontsize=22)
 axUni05a.set_ylabel(r"$\frac{S(k) t^{-1} }{S(k)|_{t=0}}$", fontsize=22)
-axUni05a.set_xlim(0, (np.pi/4)*t_vals1[-1]**m1)
+axUni05a.set_xlim(0, (np.pi/12)*t_vals1[-1]**m1)
 
 for i in plotted_ts1:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -152,7 +152,7 @@ axUni05b = figUni05b.gca()
 axUni05b.tick_params(labelsize=22)
 axUni05b.set_xlabel(r"$kt^{\frac{1}{2}}$", fontsize=22)
 axUni05b.set_ylabel(r"$\frac{S(k) t^{-1} }{S(k)|_{t=0}}$", fontsize=22)
-axUni05b.set_xlim(0, (np.pi/4)*t_vals2[-1]**m2)
+axUni05b.set_xlim(0, (np.pi/12)*t_vals2[-1]**m2)
 for i in plotted_ts2:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
     time2 = str(int(t_vals2[i]))
