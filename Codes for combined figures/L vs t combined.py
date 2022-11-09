@@ -56,6 +56,7 @@ axSn1 = figSn1.gca()
 axSn1.tick_params(labelsize=22)
 axSn1.set_xlabel(r"$k$", fontsize=22)
 axSn1.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
+axSn1.set_xlim(0, np.pi/4)
 plotted_ts1 = [1, 5, 10, 15]   # Update once data is produced
 for i in plotted_ts1:   # Update once data is produced
     #time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -69,10 +70,11 @@ axSn2 = figSn2.gca()
 axSn2.tick_params(labelsize=22)
 axSn2.set_xlabel(r"$k$", fontsize=22)
 axSn2.set_ylabel(r"S($k$)$/$S($k$)$|_{t=0}$", fontsize=22)
-plotted_ts2 = [1, 5, 10, 11]   # Update once data is produced
+axSn2.set_xlim(0, np.pi/4)
+plotted_ts2 = [1, 5, 10, 15]   # Update once data is produced
 for i in plotted_ts2:   # Update once data is produced
     #time = str(int(nth*(i-1) + t0)) + " MCS"
-    time2 = str(int(t_vals1[i]))
+    time2 = str(int(t_vals2[i]))
     axSn2.plot(kvals2, avgSk_norm2[:, i], label=r"$t=$"+time2)
 
 
@@ -101,7 +103,6 @@ print(f'with R-value of {np.round(rval2, 4)}')
 print('\n')
 ax.plot(np.log(t_vals2[1:]), c2 + m2* np.log(t_vals2[1:]), '-.b', label=r'GLT gradient={:.4f} $\pm$ {:.4f}'.format(np.round(m2, 4), np.round(std2, 4)))
 
-
 # plot S(k) rescaled for proposed universal scaling relation
 # for MC
 figUni1 = plt.figure(figsize=(10, 7))
@@ -109,6 +110,7 @@ axUni1 = figUni1.gca()
 axUni1.tick_params(labelsize=22)
 axUni1.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
 axUni1.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
+axUni1.set_xlim(0, (np.pi/4)*t_vals1[-1]**m1)
 
 for i in plotted_ts1:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
@@ -121,16 +123,46 @@ axUni2 = figUni2.gca()
 axUni2.tick_params(labelsize=22)
 axUni2.set_xlabel(r"$kt^{\frac{1}{z}}$", fontsize=22)
 axUni2.set_ylabel(r"$\frac{S(k) t^{-2/z} }{S(k)|_{t=0}}$", fontsize=22)
-
+axUni2.set_xlim(0, (np.pi/4)*t_vals2[-1]**m2)
 for i in plotted_ts2:
     #time = str(int(nth*(i-1) + t0)) + " MCS"
     time2 = str(int(t_vals2[i]))
     axUni2.plot(kvals2*t_vals2[i]**m2, avgSk_norm2[:, i]/t_vals2[i]**(2*m2), label=r"$t=$"+time2)
 
 
+# Plot with gradient of 0.5:
+m1, m2 = 0.5, 0.5
+# plot S(k) rescaled for proposed universal scaling relation
+# for MC
+figUni05a = plt.figure(figsize=(10, 7))
+axUni05a = figUni05a.gca()
+axUni05a.tick_params(labelsize=22)
+axUni05a.set_xlabel(r"$kt^{\frac{1}{2}}$", fontsize=22)
+axUni05a.set_ylabel(r"$\frac{S(k) t^{-1} }{S(k)|_{t=0}}$", fontsize=22)
+axUni05a.set_xlim(0, (np.pi/4)*t_vals1[-1]**m1)
+
+for i in plotted_ts1:
+    #time = str(int(nth*(i-1) + t0)) + " MCS"
+    time1 = str(int(t_vals1[i])) + " MCS"
+    axUni05a.plot(kvals1*t_vals1[i]**m1, avgSk_norm1[:, i]/t_vals1[i]**(2*m1), label=r"$t=$"+time1)
+
+
+figUni05b = plt.figure(figsize=(10, 7))
+axUni05b = figUni05b.gca()
+axUni05b.tick_params(labelsize=22)
+axUni05b.set_xlabel(r"$kt^{\frac{1}{2}}$", fontsize=22)
+axUni05b.set_ylabel(r"$\frac{S(k) t^{-1} }{S(k)|_{t=0}}$", fontsize=22)
+axUni05b.set_xlim(0, (np.pi/4)*t_vals2[-1]**m2)
+for i in plotted_ts2:
+    #time = str(int(nth*(i-1) + t0)) + " MCS"
+    time2 = str(int(t_vals2[i]))
+    axUni05b.plot(kvals2*t_vals2[i]**m2, avgSk_norm2[:, i]/t_vals2[i]**(2*m2), label=r"$t=$"+time2)
+
+
 axSn1.legend(fontsize=22)
 axUni1.legend(fontsize=22)
 axSn2.legend(fontsize=22)
 axUni2.legend(fontsize=22)
-
+axUni05a.legend(fontsize=22)
+axUni05b.legend(fontsize=22)
 ax.legend(fontsize=22)

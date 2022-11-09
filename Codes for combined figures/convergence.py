@@ -20,10 +20,15 @@ exponents = exponents.to_numpy()[:, 0]
 exp_errs = pd.read_excel("Data\MC\convergence_exp_errs.xlsx", index_col=0)
 exp_errs = exp_errs.to_numpy()[:, 0]
 
+# later added lower N datapoint for MC:
+Ns = np.append(np.array([32]), Ns)
+exponents = np.append(np.array([0.33119524]), exponents)
+exp_errs = np.append(np.array([0.00697884]), exp_errs)
+
 # Read in GLT data set
-zlist2 = np.loadtxt("Data\GLT\model A 1/z values.txt")
-zerr2 = np.loadtxt("Data\GLT\model A 1/z error bars.txt")
-Ns2 = np.loadtxt("Data\GLT\model A 1/z system sizes.txt")
+zlist2 = np.loadtxt("Data\GLT\model A 1.z values.txt")
+zerr2 = np.loadtxt("Data\GLT\model A 1.z value error bars.txt")
+Ns2 = np.loadtxt("Data\GLT\model A 1.z system sizes.txt")
 
 # plot it as a function of t
 fig = plt.figure(figsize=(10, 7))
